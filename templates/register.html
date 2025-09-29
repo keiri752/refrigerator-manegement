@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>新規登録 - レシピ検索アプリ</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .register-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .register-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px 30px;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .app-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .app-logo h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .app-logo p {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .form-control {
+            border-radius: 12px;
+            border: 2px solid #e9ecef;
+            padding: 15px;
+            font-size: 16px; /* iOSのズーム防止 */
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: #28a745;
+            box-shadow: 0 0 0 0.2rem rgba(40,167,69,0.25);
+        }
+        
+        .btn-register {
+            border-radius: 12px;
+            padding: 15px;
+            font-weight: 600;
+            font-size: 16px;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            border: none;
+            box-shadow: 0 4px 15px rgba(40,167,69,0.3);
+            transition: transform 0.2s;
+        }
+        
+        .btn-register:hover {
+            transform: translateY(-1px);
+            background: linear-gradient(135deg, #218838, #1e7e34);
+        }
+        
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .login-link a {
+            color: #28a745;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .alert {
+            border-radius: 12px;
+            border: none;
+        }
+        
+        .form-floating label {
+            color: #6c757d;
+            font-size: 14px;
+        }
+        
+        .form-text {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-top: 0.25rem;
+        }
+        
+        .password-strength {
+            height: 4px;
+            border-radius: 2px;
+            margin-top: 5px;
+            background: #e9ecef;
+            transition: all 0.3s;
+        }
+        
+        .password-strength.weak { background: #dc3545; }
+        .password-strength.medium { background: #ffc107; }
+        .password-strength.strong { background: #28a745; }
+        
+        @media (max-width: 480px) {
+            .register-card {
+                padding: 30px 20px;
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .app-logo h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-card">
+            <div class="app-logo">
+                <h1>🍳</h1>
+                <h2>アカウント作成</h2>
+                <p>レシピ検索を始めましょう</p>
+            </div>
+
+            <!-- フラッシュメッセージ -->
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" id="registerForm">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="username" name="username" 
+                           placeholder="ユーザー名" required autocomplete="username" minlength="3">
+                    <label for="username">ユーザー名</label>
+                    <div class="form-text">3文字以上で入力してください</div>
+                </div>
+                
+                <div class="form-floating mb-3">
+                    <input type="email" class="form-control" id="email" name="email" 
+                           placeholder="メールアドレス" required autocomplete="email">
+                    <label for="email">メールアドレス</label>
+                </div>
+                
+                <div class="form-floating mb-4">
+                    <input type="password" class="form-control" id="password" name="password" 
+                           placeholder="パスワード" required autocomplete="new-password" minlength="6">
+                    <label for="password">パスワード</label>
+                    <div class="password-strength" id="passwordStrength"></div>
+                    <div class="form-text">6文字以上で入力してください</div>
+                </div>
+                
+                <button type="submit" class="btn btn-success btn-register w-100 mb-3">
+                    アカウント作成
+                </button>
+            </form>
+            
+            <div class="login-link">
+                <p class="mb-0">既にアカウントをお持ちの方は</p>
+                <a href="{{ url_for('login') }}">ログイン</a>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // パスワード強度チェック
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            const strengthBar = document.getElementById('passwordStrength');
+            
+            if (password.length === 0) {
+                strengthBar.className = 'password-strength';
+                return;
+            }
+            
+            let strength = 'weak';
+            if (password.length >= 8) {
+                if (/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
+                    strength = 'strong';
+                } else if (/(?=.*[a-zA-Z])(?=.*\d)/.test(password)) {
+                    strength = 'medium';
+                }
+            } else if (password.length >= 6) {
+                strength = 'medium';
+            }
+            
+            strengthBar.className = `password-strength ${strength}`;
+        });
+        
+        // フォームバリデーション
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (username.length < 3) {
+                e.preventDefault();
+                alert('ユーザー名は3文字以上で入力してください');
+                return;
+            }
+            
+            if (password.length < 6) {
+                e.preventDefault();
+                alert('パスワードは6文字以上で入力してください');
+                return;
+            }
+        });
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

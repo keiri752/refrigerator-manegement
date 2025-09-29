@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>{% block title %}レシピ検索アプリ{% endblock %}</title>
+    
+    <!-- キャッシュ防止 -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="robots" content="noindex, nofollow, nocache">
+    
+    <!-- PWA設定 -->
+    <meta name="theme-color" content="#007bff">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="レシピ検索">
+    
+    <link rel="manifest" href="{{ url_for('manifest') }}">
+    <link rel="apple-touch-icon" sizes="192x192" href="{{ url_for('static', filename='icon-192x192.png') }}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ url_for('static', filename='icon-192x192.png') }}">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    
+    <style>
+        body {
+            font-size: 14px;
+            background-color: #f8f9fa;
+            padding-bottom: 80px; /* ナビゲーション分のスペース */
+        }
+        
+        .container {
+            padding: 15px;
+            max-width: 100%;
+        }
+        
+        /* ヘッダー */
+        .app-header {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            padding: 15px;
+            margin: -15px -15px 0 -15px;
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 2px 10px rgba(0,123,255,0.3);
+        }
+        
+        .app-header h1 {
+            font-size: 1.3rem;
+            margin: 0;
+        }
+        
+        .user-info {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+        
+        /* ナビゲーション（下部固定） */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #dee2e6;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+        
+        .nav-item {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .nav-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 4px;
+            color: #6c757d;
+            text-decoration: none;
+            font-size: 0.7rem;
+            min-height: 60px;
+            justify-content: center;
+        }
+        
+        .nav-link.active {
+            color: #007bff;
+            background-color: rgba(0,123,255,0.1);
+        }
+        
+        .nav-icon {
+            font-size: 1.2rem;
+            margin-bottom: 2px;
+        }
+        
+        /* カード風のセクション */
+        .section-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            border: 1px solid #e9ecef;
+        }
+        
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: #007bff;
+            margin-right: 10px;
+            border-radius: 2px;
+        }
+        
+        /* 通知カード */
+        .notification-card {
+            border-left: 4px solid;
+            margin-bottom: 10px;
+        }
+        
+        .notification-card.danger {
+            border-left-color: #dc3545;
+            background-color: #f8d7da;
+        }
+        
+        .notification-card.warning {
+            border-left-color: #ffc107;
+            background-color: #fff3cd;
+        }
+        
+        .notification-card.info {
+            border-left-color: #17a2b8;
+            background-color: #d1ecf1;
+        }
+        
+        /* フラッシュメッセージ */
+        .alert {
+            border: none;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        /* ボタン */
+        .btn {
+            min-height: 44px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        
+        .form-control, .form-select {
+            min-height: 44px;
+            border-radius: 8px;
+        }
+        
+        /* 色分け（賞味期限） */
+        .text-danger { color: #dc3545 !important; }
+        .text-warning { color: #fd7e14 !important; }
+        .text-success { color: #198754 !important; }
+        
+        /* レスポンシブ調整 */
+        @media (max-width: 576px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .section-card {
+                padding: 15px;
+            }
+            
+            .nav-link {
+                font-size: 0.65rem;
+                padding: 6px 2px;
+            }
+            
+            .nav-icon {
+                font-size: 1.1rem;
+            }
+        }
+        
+        /* コンテンツエリア */
+        .content-area {
+            min-height: calc(100vh - 140px);
+            padding-top: 20px;
+        }
+        
+        {% block extra_css %}{% endblock %}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ヘッダー -->
+        <div class="app-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1>🍳 {% block page_title %}レシピ検索アプリ{% endblock %}</h1>
+                    <div class="user-info">ようこそ、{{ session.username }}さん</div>
+                </div>
+                <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm">
+                    ログアウト
+                </a>
+            </div>
+        </div>
+
+        <!-- フラッシュメッセージ -->
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-info alert-dismissible" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" onclick="this.parentElement.style.display='none'">×</button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- メインコンテンツ -->
+        <div class="content-area">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <!-- 下部ナビゲーション -->
+    <nav class="bottom-nav">
+        <div class="d-flex">
+            <div class="nav-item">
+                <a href="{{ url_for('dashboard') }}" class="nav-link {{ 'active' if request.endpoint == 'dashboard' }}">
+                    <div class="nav-icon">🏠</div>
+                    <div>ホーム</div>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{{ url_for('refrigerator') }}" class="nav-link {{ 'active' if request.endpoint == 'refrigerator' }}">
+                    <div class="nav-icon">❄️</div>
+                    <div>冷蔵庫</div>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{{ url_for('search') }}" class="nav-link {{ 'active' if request.endpoint == 'search' }}">
+                    <div class="nav-icon">🔍</div>
+                    <div>レシピ</div>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{{ url_for('add_ingredient') }}" class="nav-link {{ 'active' if request.endpoint == 'add_ingredient' }}">
+                    <div class="nav-icon">➕</div>
+                    <div>追加</div>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- JavaScript -->
+    {% block extra_js %}
+        <script>
+        // PWA Service Worker登録
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then(function(registration) {
+                    console.log('✅ Service Worker registered');
+                })
+                .catch(function(error) {
+                    console.log('❌ Service Worker registration failed:', error);
+                });
+        }
+        
+        // フォーム送信の重複防止
+        document.addEventListener('submit', function(e) {
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                setTimeout(function() {
+                    submitBtn.disabled = false;
+                }, 3000);
+            }
+        });
+        
+    {% endblock %}
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,412 @@
+{% extends "base.html" %}
+
+{% block title %}食材追加 - レシピ検索アプリ{% endblock %}
+{% block page_title %}食材追加{% endblock %}
+
+{% block extra_css %}
+<style>
+    .add-form-card {
+        background: linear-gradient(135deg, #28a745, #20c997);
+        color: white;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 20px;
+    }
+
+    .add-form-card .form-label {
+        color: rgb(0, 0, 0);
+    }
+    
+    .add-form-card input,
+    .add-form-card select,
+    .add-form-card .form-control {
+        border: none;
+        border-radius: 8px;
+        padding: 12px;
+        font-size: 14px;
+    }
+    
+    .add-form-card .btn {
+        border: none;
+        background: rgba(255,255,255,0.2);
+        color: white;
+        font-weight: 600;
+        padding: 12px 20px;
+    }
+    
+    .add-form-card .btn:hover {
+        background: rgba(255,255,255,0.3);
+    }
+    
+    .add-form-card label {
+        color: white;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+    
+    .quick-add-buttons {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 8px;
+        margin-bottom: 20px;
+    }
+    
+    .quick-add-btn {
+        background: white;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        padding: 10px;
+        text-align: center;
+        text-decoration: none;
+        color: #495057;
+        font-size: 0.8rem;
+        transition: all 0.3s;
+    }
+    
+    .quick-add-btn:hover {
+        border-color: #007bff;
+        color: #007bff;
+        background: rgba(0,123,255,0.1);
+    }
+    
+    .tips-card {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 20px;
+    }
+    
+    .tip-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 15px;
+    }
+    
+    .tip-icon {
+        font-size: 1.2rem;
+        margin-right: 10px;
+        margin-top: 2px;
+    }
+    
+    .recent-ingredients {
+        max-height: 200px;
+        overflow-y: auto;
+    }
+    
+    .selected-tags-container {
+        min-height: 40px;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 8px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+
+    .selected-tag {
+        background: #007bff;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .tag-remove {
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .tag-suggestions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        margin-top: 8px;
+    }
+
+    .tag-btn {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 12px;
+        padding: 4px 8px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .tag-btn:hover {
+        background: #007bff;
+        color: white;
+    }
+
+    .recent-item {
+        background: #f8f9fa;
+        border-radius: 6px;
+        padding: 8px 12px;
+        margin-bottom: 5px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    
+    .recent-item:hover {
+        background: #e9ecef;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- メイン追加フォーム -->
+<div class="add-form-card">
+    <div class="section-title text-black">➕ 新しい食材を追加</div>
+    <form method="POST">
+        <div class="row g-3">
+            <div class="col-12">
+                <label for="ingredient" class="form-label">食材名</label>
+                <input type="text" name="ingredient" id="ingredient" class="form-control" 
+                       placeholder="例: にんじん、牛肉、卵など" required autocomplete="off" autofocus>
+            </div>
+            
+            <div class="col-md-6">
+                <label for="expiry_date" class="form-label">賞味期限</label>
+                <input type="date" name="expiry_date" id="expiry_date" class="form-control">
+                <small class="text-white-50">未設定でも登録できます</small>
+            </div>
+            
+            <div class="col-md-6">
+                <label for="quantity" class="form-label">数量</label>
+                <div class="input-group">
+                    <button type="button" class="btn btn-outline-light" onclick="changeQuantity(-1)">−</button>
+                    <input type="number" name="quantity" id="quantity" value="1" min="1" max="99" class="form-control text-center">
+                    <button type="button" class="btn btn-outline-light" onclick="changeQuantity(1)">+</button>
+                </div>
+            </div>
+
+<div class="col-md-6">
+    <label for="category" class="form-label">カテゴリ</label>
+    <select name="category" id="category" class="form-control" required>
+        <option value="">カテゴリを選択してください</option>
+        <option value="野菜">野菜</option>
+        <option value="肉類">肉類</option>
+        <option value="魚介類">魚介類</option>
+        <option value="乳製品">乳製品</option>
+        <option value="穀類">穀類</option>
+        <option value="調味料">調味料</option>
+        <option value="その他">その他</option>
+    </select>
+</div>
+            
+            <div class="col-12">
+                <button type="submit" class="btn btn-light w-100">
+                    📦 <span style="color: black;">食材を登録する</span>
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- よく使う食材（クイック追加） -->
+<div class="section-card">
+    <div class="section-title">⚡ よく使う食材</div>
+    <p class="text-muted small mb-3">タップすると入力欄に自動入力＆カテゴリも設定されます</p>
+    <div class="quick-add-buttons">
+        <button type="button" class="quick-add-btn" onclick="quickAdd('にんじん')">🥕<br>にんじん</button>
+        <button type="button" class="quick-add-btn" onclick="quickAdd('たまねぎ')">🧅<br>たまねぎ</button>
+        <button type="button" class="quick-add-btn" onclick="quickAdd('じゃがいも')">🥔<br>じゃがいも</button>
+        <button type="button" class="quick-add-btn" onclick="quickAdd('キャベツ')">🥬<br>キャベツ</button>
+        <button type="button" class="quick-add-btn" onclick="quickAdd('豚肉')">🥓<br>豚肉</button>
+        <button type="button" class="quick-add-btn" onclick="quickAdd('鶏肉')">🍗<br>鶏肉</button>
+        <button type="button" class="quick-add-btn" onclick="quickAdd('卵')">🥚<br>卵</button>
+        <button type="button" class="quick-add-btn" onclick="quickAdd('牛乳')">🥛<br>牛乳</button>
+        <button type="button" class="quick-add-btn" onclick="quickAdd('豆腐')">🍲<br>豆腐</button>
+        <button type="button" class="quick-add-btn" onclick="quickAdd('もやし')">🌱<br>もやし</button>
+        <button type="button" class="quick-add-btn" onclick="quickAdd('トマト')">🍅<br>トマト</button>
+        <button type="button" class="quick-add-btn" onclick="quickAdd('米')">🍚<br>米</button>
+    </div>
+</div>
+
+<!-- 便利な機能とコツ -->
+<div class="tips-card">
+    <div class="section-title">💡 食材登録のコツ</div>
+    
+    <div class="tip-item">
+        <div class="tip-icon">📅</div>
+        <div>
+            <strong>賞味期限を設定</strong><br>
+            <small class="text-muted">期限が近づくと自動でお知らせします</small>
+        </div>
+    </div>
+    
+    <div class="tip-item">
+        <div class="tip-icon">🔢</div>
+        <div>
+            <strong>正確な数量を入力</strong><br>
+            <small class="text-muted">レシピ検索時に適量を判断できます</small>
+        </div>
+    </div>
+    
+    <div class="tip-item">
+        <div class="tip-icon">✏️</div>
+        <div>
+            <strong>具体的な名前で登録</strong><br>
+            <small class="text-muted">「肉」より「豚肉」「鶏肉」の方が検索精度UP</small>
+        </div>
+    </div>
+    
+    <div class="tip-item">
+        <div class="tip-icon">📱</div>
+        <div>
+            <strong>まとめて登録</strong><br>
+            <small class="text-muted">買い物後にまとめて登録すると効率的</small>
+        </div>
+    </div>
+</div>
+
+<!-- 今すぐできるアクション -->
+<div class="section-card">
+    <div class="section-title">🚀 次にやってみる</div>
+    <div class="d-grid gap-2 d-md-flex">
+        <a href="{{ url_for('add_ingredient') }}" class="btn btn-success" onclick="document.getElementById('ingredient').focus();">
+            続けて追加
+        </a>
+        <a href="{{ url_for('refrigerator') }}" class="btn btn-primary">
+            冷蔵庫を確認
+        </a>
+        <a href="{{ url_for('search') }}" class="btn btn-outline-primary">
+            レシピ検索
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+
+    // 数量変更ボタン
+    function changeQuantity(delta) {
+        const quantityInput = document.getElementById('quantity');
+        let currentValue = parseInt(quantityInput.value) || 1;
+        let newValue = currentValue + delta;
+        
+        if (newValue < 1) newValue = 1;
+        if (newValue > 99) newValue = 99;
+        
+        quantityInput.value = newValue;
+    }
+    
+ // 食材とカテゴリのマッピング（詳細版）
+const ingredientCategories = {
+    // 野菜
+    'にんじん': '野菜',
+    'たまねぎ': '野菜', 
+    'じゃがいも': '野菜',
+    'キャベツ': '野菜',
+    'トマト': '野菜',
+    'もやし': '野菜',
+    'きゅうり': '野菜',
+    'なす': '野菜',
+    'ピーマン': '野菜',
+    'レタス': '野菜',
+    
+    // 肉類
+    '豚肉': '肉類',
+    '鶏肉': '肉類', 
+    '牛肉': '肉類',
+    'ひき肉': '肉類',
+    'ベーコン': '肉類',
+    'ハム': '肉類',
+    
+    // 魚介類
+    'さば': '魚介類',
+    'さけ': '魚介類',
+    'まぐろ': '魚介類',
+    'えび': '魚介類',
+    'いか': '魚介類',
+    
+    // 乳製品
+    '卵': '乳製品',
+    '牛乳': '乳製品',
+    'バター': '乳製品',
+    'チーズ': '乳製品',
+    'ヨーグルト': '乳製品',
+    
+    // 穀類
+    '米': '穀類',
+    'パン': '穀類',
+    'パスタ': '穀類',
+    'うどん': '穀類',
+    
+    // 調味料
+    '醤油': '調味料',
+    '味噌': '調味料',
+    '塩': '調味料',
+    '砂糖': '調味料',
+    'サラダ油': '調味料',
+    
+    // その他
+    '豆腐': 'その他',
+    '納豆': 'その他'
+};
+
+function quickAdd(ingredientName) {
+    const ingredientInput = document.getElementById('ingredient');
+    const categorySelect = document.getElementById('category');
+    
+    // 食材名を設定
+    ingredientInput.value = ingredientName;
+    
+    // 自動カテゴリ設定
+    if (ingredientCategories[ingredientName]) {
+        categorySelect.value = ingredientCategories[ingredientName];
+        
+        // カテゴリ設定の視覚的フィードバック
+        categorySelect.style.backgroundColor = '#d4edda';
+        categorySelect.style.border = '2px solid #28a745';
+        
+        setTimeout(() => {
+            categorySelect.style.backgroundColor = '';
+            categorySelect.style.border = '';
+        }, 1000);
+    }
+    
+    // 食材名の視覚的フィードバック
+    ingredientInput.style.backgroundColor = '#e3f2fd';
+    setTimeout(() => {
+        ingredientInput.style.backgroundColor = '';
+    }, 500);
+    
+    // 入力フィールドにフォーカス（次の入力がしやすいように）
+    ingredientInput.focus();
+}
+    // 今日の日付を賞味期限の初期値に設定（オプション）
+    function setDefaultExpiry(days = 7) {
+        const expiryInput = document.getElementById('expiry_date');
+        const today = new Date();
+        today.setDate(today.getDate() + days);
+        expiryInput.value = today.toISOString().split('T')[0];
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('➕ Add ingredient page loaded');
+        
+        const expiryInput = document.getElementById('expiry_date');
+        const quickExpiryDiv = document.createElement('div');
+        quickExpiryDiv.className = 'mt-1';
+        quickExpiryDiv.innerHTML = `
+            <small class="text-black-50">クイック設定: </small>
+            <button type="button" class="btn btn-sm btn-outline-light text-dark me-1" onclick="setDefaultExpiry(3)">3日後</button>
+            <button type="button" class="btn btn-sm btn-outline-light text-dark me-1" onclick="setDefaultExpiry(7)">1週間</button>
+            <button type="button" class="btn btn-sm btn-outline-light text-dark" onclick="setDefaultExpiry(14)">2週間</button>
+        `;
+        expiryInput.parentNode.appendChild(quickExpiryDiv);
+    });
+
+    // フォーム送信ログ
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const ingredientName = document.getElementById('ingredient').value;
+        const categoryName = document.getElementById('category').value;
+        console.log('📦 Adding ingredient:', ingredientName, 'カテゴリ:', categoryName);
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,86 @@
+{% for ing in items %}
+    {% set color_class = "" %}
+    {% set status_text = "" %}
+    {% if ing.expiry_date %}
+        {% set days_left = (ing.expiry_date - date.today()).days %}
+        {% if days_left < 0 %}
+            {% set color_class = "text-danger fw-bold" %}
+            {% set status_text = "期限切れ" %}
+        {% elif days_left == 0 %}
+            {% set color_class = "text-danger fw-bold" %}
+            {% set status_text = "今日まで" %}
+        {% elif days_left <= 3 %}
+            {% set color_class = "text-danger" %}
+            {% set status_text = days_left ~ "日後" %}
+        {% elif days_left <= 7 %}
+            {% set color_class = "text-warning" %}
+            {% set status_text = days_left ~ "日後" %}
+        {% else %}
+            {% set color_class = "text-success" %}
+            {% set status_text = days_left ~ "日後" %}
+        {% endif %}
+    {% endif %}
+
+    <div class="ingredient-controls" id="ingredient-{{ ing.id }}">
+        <div style="flex: 1;">
+            <div class="ingredient-name {{ color_class }}">
+                {{ ing.name }}
+                <button type="button" 
+                        class="btn btn-sm btn-outline-secondary ms-2" 
+                        onclick="toggleCategoryEdit({{ ing.id }})"
+                        title="カテゴリを変更">
+                    🏷️
+                </button>
+            </div>
+            
+            <!-- カテゴリ表示/編集 -->
+            <div class="ingredient-category">
+                <span class="category-display-{{ ing.id }}">
+                    <small class="text-muted">📂 {{ ing.category }}</small>
+                </span>
+                
+                <!-- カテゴリ編集フォーム（初期は非表示） -->
+                <form class="category-edit-form-{{ ing.id }} d-none" 
+                      action="{{ url_for('edit_category', id=ing.id) }}" 
+                      method="post" 
+                      style="display: inline;">
+                    <select name="category" class="form-select form-select-sm d-inline-block w-auto">
+                        {% for cat in all_categories %}
+                        <option value="{{ cat }}" {% if cat == ing.category %}selected{% endif %}>
+                            {{ cat }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-sm btn-success">保存</button>
+                    <button type="button" 
+                            class="btn btn-sm btn-secondary" 
+                            onclick="toggleCategoryEdit({{ ing.id }})">
+                        キャンセル
+                    </button>
+                </form>
+            </div>
+            
+            <div class="ingredient-info">
+                {% if ing.expiry_date %}
+                    {{ ing.expiry_date.strftime("%Y/%m/%d") }} ({{ status_text }})
+                {% else %}
+                    賞味期限未設定
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- 数量コントロール -->
+        <div class="quantity-controls">
+            <form action="{{ url_for('change_quantity', id=ing.id, action='minus') }}" method="post" style="display:inline;">
+                <button type="submit" class="btn btn-outline-secondary btn-sm btn-quantity">−</button>
+            </form>
+            <span class="mx-2 fw-bold">{{ ing.quantity }}</span>
+            <form action="{{ url_for('change_quantity', id=ing.id, action='plus') }}" method="post" style="display:inline;">
+                <button type="submit" class="btn btn-outline-secondary btn-sm btn-quantity">+</button>
+            </form>
+            <a href="{{ url_for('delete_ingredient', id=ing.id) }}" 
+               class="btn btn-outline-danger btn-sm ms-2"
+               onclick="return confirm('{{ ing.name }}を削除しますか？')">🗑</a>
+        </div>
+    </div>
+{% endfor %}

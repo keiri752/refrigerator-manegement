@@ -1,0 +1,71 @@
+{
+  "name": "レシピ検索アプリ - 冷蔵庫食材活用",
+  "short_name": "レシピ検索",
+  "description": "冷蔵庫の食材から美味しいレシピを見つけよう。賞味期限管理もできる便利なアプリです。",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#007bff",
+  "scope": "/",
+  "lang": "ja",
+  "dir": "ltr",
+  "categories": ["food", "lifestyle", "utilities"],
+  "icons": [
+    {
+      "src": "/static/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/static/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "食材追加",
+      "short_name": "追加",
+      "description": "新しい食材をすぐに追加",
+      "url": "/add",
+      "icons": [
+        {
+          "src": "/static/icon-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "レシピ検索", 
+      "short_name": "検索",
+      "description": "食材からレシピを検索",
+      "url": "/search",
+      "icons": [
+        {
+          "src": "/static/icon-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "冷蔵庫",
+      "short_name": "冷蔵庫", 
+      "description": "登録した食材一覧",
+      "url": "/refrigerator",
+      "icons": [
+        {
+          "src": "/static/icon-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  }
+}

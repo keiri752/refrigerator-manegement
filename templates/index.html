@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>レシピ検索アプリ</title>
+    
+    <!-- キャッシュ防止メタタグ（ユーザー固有データのため） -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="robots" content="noindex, nofollow, nocache">
+    
+    <!-- PWA用のメタタグ -->
+    <meta name="theme-color" content="#007bff">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="レシピ検索">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="{{ url_for('manifest') }}">
+    
+    <!-- アイコン -->
+    <link rel="apple-touch-icon" sizes="192x192" href="{{ url_for('static', filename='icon-192x192.png') }}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ url_for('static', filename='icon-192x192.png') }}">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    
+    <style>
+        /* モバイル専用スタイル */
+        body {
+            padding-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .container {
+            padding: 15px;
+        }
+        
+        /* ヘッダー */
+        .app-header {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            padding: 15px;
+            margin: -15px -15px 20px -15px;
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 2px 10px rgba(0,123,255,0.3);
+        }
+        
+        .app-header h1 {
+            font-size: 1.5rem;
+            margin: 0;
+        }
+        
+        .user-info {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+        
+        /* カード風のセクション */
+        .section-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            border: 1px solid #e9ecef;
+        }
+        
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: #007bff;
+            margin-right: 10px;
+            border-radius: 2px;
+        }
+        
+        /* 食材チェックボックス */
+        .ingredient-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 10px;
+            background: #f8f9fa;
+        }
+        
+        .form-check {
+            padding: 8px;
+            border-radius: 6px;
+            margin-bottom: 5px;
+        }
+        
+        .form-check:hover {
+            background: rgba(0,123,255,0.1);
+        }
+        
+        /* 食材管理のボタングループ */
+        .ingredient-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .ingredient-name {
+            font-weight: 600;
+            color: #495057;
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .btn-quantity {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* 検索ボタンとフォーム */
+        .search-form input[type="text"] {
+            border-radius: 25px;
+            padding: 12px 20px;
+            border: 2px solid #e9ecef;
+            font-size: 14px;
+        }
+        
+        .search-form input[type="text"]:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+        }
+        
+        .btn-search {
+            border-radius: 25px;
+            padding: 12px 25px;
+            font-weight: 600;
+            box-shadow: 0 2px 10px rgba(0,123,255,0.3);
+        }
+        
+        /* 食材追加フォーム */
+        .add-ingredient-form {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        .add-ingredient-form input {
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+        }
+        
+        .add-ingredient-form .btn {
+            border: none;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            font-weight: 600;
+        }
+        
+        /* レシピの表示制御（JavaScript制御） */
+        .recipe-item {
+            display: none;
+        }
+        
+        .show-more-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .btn-show-more {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0,123,255,0.3);
+            transition: transform 0.2s;
+        }
+        
+        .btn-show-more:hover {
+            transform: translateY(-1px);
+            background: linear-gradient(135deg, #0056b3, #004085);
+        }
+        
+        .results-info {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        /* レシピカード */
+        .recipe-card {
+            border: none;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        
+        .recipe-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .recipe-card img {
+            height: 150px;
+            object-fit: cover;
+        }
+        
+        .recipe-card .card-title {
+            font-size: 0.9rem;
+            line-height: 1.3;
+        }
+        
+        /* フラッシュメッセージ */
+        .alert {
+            border: none;
+            border-radius: 10px;
+        }
+        
+        /* 空の状態 */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+        
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+        
+        /* タッチ操作の改善 */
+        .btn {
+            min-height: 44px;
+            border-radius: 8px;
+        }
+        
+        .form-control, .form-select {
+            min-height: 44px;
+            border-radius: 8px;
+        }
+        
+        /* 色分け（賞味期限） */
+        .text-danger { color: #dc3545 !important; }
+        .text-warning { color: #fd7e14 !important; }
+        .text-success { color: #198754 !important; }
+        
+        /* レスポンシブ調整 */
+        @media (max-width: 576px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .section-card {
+                padding: 15px;
+            }
+            
+            .col-6 {
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+        
+        /* インストール案内 */
+        .install-notice {
+            background: linear-gradient(135deg, #17a2b8, #138496);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        
+        .install-notice strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- PWAインストール案内 -->
+        <div class="install-notice" id="install-notice" style="display: none;">
+            <strong>📱 アプリとして使用できます</strong>
+            ブラウザメニューから「ホーム画面に追加」を選択してください
+        </div>
+
+        <!-- ヘッダー -->
+        <div class="app-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1>🍳 レシピ検索</h1>
+                    <div class="user-info">ようこそ、{{ session.username }}さん</div>
+                </div>
+                <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm">
+                    ログアウト
+                </a>
+            </div>
+        </div>
+
+        <!-- フラッシュメッセージ -->
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-info alert-dismissible" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" onclick="this.parentElement.style.display='none'">×</button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- 検索セクション -->
+        <div class="section-card">
+            <div class="section-title">🔍 食材とキーワードで検索</div>
+            <form method="POST" action="{{ url_for('search_combined') }}" class="search-form">
+                <div class="mb-3">
+                    <input type="text" name="query" class="form-control" 
+                           placeholder="例: スープ、揚げ物など" autocomplete="off">
+                </div>
+                
+                {% if ingredients %}
+                    <div class="mb-3">
+                        <small class="text-muted">使いたい食材を選択:</small>
+                        <div class="ingredient-list">
+                            {% for ing in ingredients %}
+                                {% set color_class = "" %}
+                                {% if ing.expiry_date %}
+                                    {% set days_left = (ing.expiry_date - date.today()).days %}
+                                    {% if days_left < 0 %}
+                                        {% set color_class = "text-danger fw-bold" %}
+                                    {% elif days_left <= 3 %}
+                                        {% set color_class = "text-danger" %}
+                                    {% elif days_left <= 7 %}
+                                        {% set color_class = "text-warning" %}
+                                    {% else %}
+                                        {% set color_class = "text-success" %}
+                                    {% endif %}
+                                {% endif %}
+                                
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" 
+                                           name="selected_ingredients" value="{{ ing.name }}">
+                                    <label class="form-check-label {{ color_class }}">
+                                        {{ ing.name }}
+                                        {% if ing.expiry_date %}
+                                            ({{ ing.expiry_date.strftime("%m/%d") }})
+                                        {% endif %}
+                                        × {{ ing.quantity }}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+                
+                <button type="submit" class="btn btn-success btn-search w-100">
+                    🔍 検索する
+                </button>
+            </form>
+        </div>
+
+        <!-- 食材管理セクション -->
+        {% if ingredients %}
+            <div class="section-card">
+                <div class="section-title">📦 食材の管理</div>
+                {% for ing in ingredients %}
+                    <div class="ingredient-controls">
+                        <span class="ingredient-name">{{ ing.name }}</span>
+                        <div class="quantity-controls">
+                            <form action="{{ url_for('change_quantity', id=ing.id, action='minus') }}" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-outline-secondary btn-sm btn-quantity">−</button>
+                            </form>
+                            <span class="mx-2 fw-bold">{{ ing.quantity }}</span>
+                            <form action="{{ url_for('change_quantity', id=ing.id, action='plus') }}" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-outline-secondary btn-sm btn-quantity">＋</button>
+                            </form>
+                            <a href="{{ url_for('delete_ingredient', id=ing.id) }}" 
+                               class="btn btn-outline-danger btn-sm ms-2"
+                               onclick="return confirm('{{ ing.name }}を削除しますか？')">🗑</a>
+                        </div>
+                    </div>
+                {% endfor %}
+                
+                <!-- ソートボタン -->
+                <div class="mt-3">
+                    {% if sort == "expiry" %}
+                        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary btn-sm">通常順</a>
+                    {% else %}
+                        <a href="{{ url_for('index', sort='expiry') }}" class="btn btn-warning btn-sm">期限順</a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- 食材追加セクション -->
+        <div class="add-ingredient-form">
+            <div class="section-title text-white">➕ 食材を登録</div>
+            <form action="{{ url_for('add_ingredient') }}" method="post">
+                <div class="row g-2">
+                    <div class="col-12 col-sm-6">
+                        <input type="text" name="ingredient" class="form-control" 
+                               placeholder="食材名を入力" required autocomplete="off">
+                    </div>
+                    <div class="col-6 col-sm-3">
+                        <input type="date" name="expiry_date" class="form-control">
+                    </div>
+                    <div class="col-6 col-sm-3">
+                        <div class="input-group">
+                            <input type="number" name="quantity" value="1" min="1" class="form-control">
+                            <button type="submit" class="btn btn-light">追加</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- 検索結果 -->
+        {% if results %}
+            <div class="section-card">
+                <div class="section-title">🍽️ 検索結果</div>
+                <div class="results-info">
+                    <span id="visible-count">0</span>件表示中 / 全<span id="total-count">{{ results|length }}</span>件
+                </div>
+                <div class="row g-2" id="recipe-container">
+                    {% for r in results %}
+                        <div class="col-6 recipe-item">
+                            <div class="card recipe-card h-100">
+                                {% if r.img %}
+                                    <img src="{{ r.img }}" class="card-img-top" alt="{{ r.title }}" loading="lazy">
+                                {% endif %}
+                                <div class="card-body p-2">
+                                    <h6 class="card-title">{{ r.title }}</h6>
+                                    <div class="d-flex justify-content-between align-items-center mt-2">
+                                        <span class="badge bg-info">{{ r.source }}</span>
+                                        <a href="{{ r.url }}" class="btn btn-primary btn-sm" target="_blank" rel="noopener">
+                                            開く
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                
+                <div class="show-more-container">
+                    <button id="load-more-btn" class="btn btn-show-more" onclick="showMore()">
+                        もっと見る
+                    </button>
+                </div>
+            </div>
+        {% endif %}
+
+        {% if not ingredients %}
+            <div class="empty-state">
+                <div class="empty-state-icon">🥬</div>
+                <h5>食材を登録しましょう</h5>
+                <p>まずは冷蔵庫にある食材を登録して、<br>レシピ検索を始めてみてください。</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Service Worker とアプリ機能のJavaScript -->
+    <script>
+        // PWA Service Worker登録
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then(function(registration) {
+                    console.log('✅ Service Worker registered:', registration);
+                })
+                .catch(function(error) {
+                    console.log('❌ Service Worker registration failed:', error);
+                });
+        }
+        
+        // インストール案内の表示制御
+        function showInstallNotice() {
+            if (!localStorage.getItem('hideInstallNotice')) {
+                const notice = document.getElementById('install-notice');
+                if (notice) {
+                    notice.style.display = 'block';
+                    setTimeout(function() {
+                        notice.style.display = 'none';
+                        localStorage.setItem('hideInstallNotice', 'true');
+                    }, 8000); // 8秒後に自動非表示
+                }
+            }
+        }
+        
+        // レシピ表示制御
+        let visibleCount = 0;
+        const step = 8; // スマホ向けに1回の表示数を調整
+        const allItems = document.querySelectorAll('.recipe-item');
+        const loadMoreBtn = document.getElementById('load-more-btn');
+        const visibleCountSpan = document.getElementById('visible-count');
+        
+        function showMore() {
+            const maxShow = Math.min(visibleCount + step, allItems.length);
+            
+            for (let i = visibleCount; i < maxShow; i++) {
+                allItems[i].style.display = 'block';
+            }
+            
+            visibleCount = maxShow;
+            if (visibleCountSpan) {
+                visibleCountSpan.textContent = visibleCount;
+            }
+            
+            if (visibleCount >= allItems.length && loadMoreBtn) {
+                loadMoreBtn.style.display = 'none';
+            }
+        }
+        
+        // ページ読み込み時の初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Recipe Search App loaded');
+            
+            // インストール案内表示
+            showInstallNotice();
+            
+            // レシピがある場合は初期表示
+            if (allItems.length > 0) {
+                showMore();
+                console.log(`📱 Showing ${Math.min(step, allItems.length)} of ${allItems.length} recipes`);
+            }
+            
+            // Service Worker のメッセージ送信（キャッシュクリア用）
+            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                navigator.serviceWorker.controller.postMessage({
+                    type: 'CLEAR_USER_CACHE'
+                });
+            }
+        });
+        
+        // PWA インストールプロンプト
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', function(e) {
+            console.log('📱 PWA install prompt available');
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // インストール案内を表示
+            const notice = document.getElementById('install-notice');
+            if (notice && !localStorage.getItem('hideInstallNotice')) {
+                notice.style.display = 'block';
+                notice.innerHTML = `
+                    <strong>📱 アプリとしてインストール可能</strong>
+                    <button onclick="installApp()" class="btn btn-light btn-sm ms-2">インストール</button>
+                    <button onclick="hideInstallNotice()" class="btn btn-outline-light btn-sm ms-1">×</button>
+                `;
+            }
+        });
+        
+        // PWAインストール実行
+        function installApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then(function(choiceResult) {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('✅ PWA install accepted');
+                    } else {
+                        console.log('❌ PWA install declined');
+                    }
+                    deferredPrompt = null;
+                    hideInstallNotice();
+                });
+            }
+        }
+        
+        // インストール案内を非表示
+        function hideInstallNotice() {
+            const notice = document.getElementById('install-notice');
+            if (notice) {
+                notice.style.display = 'none';
+                localStorage.setItem('hideInstallNotice', 'true');
+            }
+        }
+        
+        // オンライン/オフライン状態の監視
+        window.addEventListener('online', function() {
+            console.log('🌐 Back online');
+            // オンライン復帰時の処理（必要に応じて）
+        });
+        
+        window.addEventListener('offline', function() {
+            console.log('📡 Gone offline');
+            // オフライン時の処理（必要に応じて）
+        });
+        
+        // フォーム送信時の重複防止
+        document.addEventListener('submit', function(e) {
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                setTimeout(function() {
+                    submitBtn.disabled = false;
+                }, 3000);
+            }
+        });
+        
+        // デバッグ情報（開発時のみ）
+        if (console && typeof console.log === 'function') {
+            console.log('🔧 Debug Info:');
+            console.log('- User:', '{{ session.username }}');
+            console.log('- Ingredients count:', {{ ingredients|length if ingredients else 0 }});
+            console.log('- Results count:', {{ results|length if results else 0 }});
+            console.log('- Cache prevention: ACTIVE');
+            console.log('- Service Worker: v2');
+        }
+    </script>
+    
+    <!-- Bootstrap JS（フラッシュメッセージ用） -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

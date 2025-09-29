@@ -1,0 +1,398 @@
+{% extends "base.html" %}
+
+{% block title %}ホーム - レシピ検索アプリ{% endblock %}
+{% block page_title %}ホーム{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stats-card {
+        background: linear-gradient(135deg, #28a745, #20c997);
+        color: white;
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    
+    .stats-number {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    
+    .stats-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+    
+    .quick-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 20px;
+    }
+    
+    .action-btn {
+        background: white;
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        padding: 20px;
+        text-decoration: none;
+        color: #495057;
+        transition: all 0.3s;
+        text-align: center;
+    }
+    
+    .action-btn:hover {
+        border-color: #007bff;
+        color: #007bff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0,123,255,0.2);
+    }
+    
+    .action-icon {
+        font-size: 2rem;
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    /* おすすめレシピ用スタイル */
+    .recipe-recommendations {
+        background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+        color: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .recipe-card {
+        background: white;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        transition: transform 0.2s ease;
+    }
+
+    .recipe-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+
+    .recipe-card:last-child {
+        margin-bottom: 0;
+    }
+
+    .recipe-image {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 6px;
+        float: left;
+        margin-right: 15px;
+    }
+
+    .recipe-content {
+        overflow: hidden;
+    }
+
+    .recipe-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+        line-height: 1.3;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .recipe-meta {
+        font-size: 0.8rem;
+        color: #666;
+        margin-bottom: 8px;
+    }
+
+    .recipe-ingredient-tag {
+        background: #e3f2fd;
+        color: #1976d2;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        font-weight: 500;
+    }
+
+    .recipe-actions {
+        margin-top: 10px;
+        display: flex;
+        gap: 8px;
+    }
+
+    .btn-recipe {
+        font-size: 0.8rem;
+        padding: 4px 12px;
+        border-radius: 15px;
+    }
+
+    .no-image-placeholder {
+        width: 80px;
+        height: 80px;
+        background: #f8f9fa;
+        border: 2px dashed #dee2e6;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: #adb5bd;
+        float: left;
+        margin-right: 15px;
+    }
+
+    @media (max-width: 768px) {
+        .recipe-image, .no-image-placeholder {
+            width: 60px;
+            height: 60px;
+            margin-right: 10px;
+        }
+        
+        .recipe-title {
+            font-size: 0.9rem;
+        }
+        
+        .quick-actions {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- 統計情報 -->
+<div class="stats-card">
+    <div class="stats-number">{{ total_ingredients }}</div>
+    <div class="stats-label">登録されている食材</div>
+</div>
+
+<!-- 賞味期限通知 -->
+{% if notifications.expired or notifications.expiring_soon or notifications.expiring_week %}
+    <div class="section-card">
+        <div class="section-title">🔔 お知らせ</div>
+        
+        {% if notifications.expired %}
+            <div class="notification-card danger card p-3">
+                <h6 class="text-danger mb-2">⚠️ 賞味期限切れの食材があります</h6>
+                <div class="small">
+                    {% for ing in notifications.expired %}
+                        <span class="badge bg-danger me-1">{{ ing.name }}</span>
+                    {% endfor %}
+                </div>
+                <div class="mt-2">
+                    <a href="{{ url_for('refrigerator') }}" class="btn btn-sm btn-danger">確認する</a>
+                </div>
+            </div>
+        {% endif %}
+        
+        {% if notifications.expiring_soon %}
+            <div class="notification-card warning card p-3">
+                <h6 class="text-warning mb-2">⏰ 3日以内に期限切れになる食材</h6>
+                <div class="small">
+                    {% for ing in notifications.expiring_soon %}
+                        {% set days_left = (ing.expiry_date - date.today()).days %}
+                        <span class="badge bg-warning me-1">
+                            {{ ing.name }} ({{ days_left }}日)
+                        </span>
+                    {% endfor %}
+                </div>
+                <div class="mt-2">
+                    <a href="{{ url_for('search') }}" class="btn btn-sm btn-warning">レシピを探す</a>
+                </div>
+            </div>
+        {% endif %}
+        
+        {% if notifications.expiring_week %}
+            <div class="notification-card info card p-3">
+                <h6 class="text-info mb-2">📅 1週間以内に期限切れになる食材</h6>
+                <div class="small">
+                    {% for ing in notifications.expiring_week %}
+                        {% set days_left = (ing.expiry_date - date.today()).days %}
+                        <span class="badge bg-info me-1">
+                            {{ ing.name }} ({{ days_left }}日)
+                        </span>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% else %}
+    <div class="section-card">
+        <div class="section-title">✅ すべて良好です</div>
+        <p class="text-muted mb-0">賞味期限の問題はありません。</p>
+    </div>
+{% endif %}
+
+<!-- おすすめレシピセクション -->
+{% if recommended_recipes %}
+<div class="recipe-recommendations">
+    <div class="section-title text-white mb-3">🍳 期限切れ間近の食材でおすすめレシピ</div>
+    <p class="text-white-50 mb-3 small">賞味期限が近い食材を使って、今すぐ作れるレシピをご提案します</p>
+    
+    {% for recipe in recommended_recipes %}
+    <div class="recipe-card">
+        {% if recipe.img %}
+            <img src="{{ recipe.img }}" alt="{{ recipe.title }}" class="recipe-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div class="no-image-placeholder" style="display: none;">🍽️</div>
+        {% else %}
+            <div class="no-image-placeholder">🍽️</div>
+        {% endif %}
+        
+        <div class="recipe-content">
+            <div class="recipe-title">{{ recipe.title }}</div>
+            <div class="recipe-meta">
+                <strong>{{ recipe.source }}</strong>
+                {% if recipe.ingredient_used %}
+                    • <span class="recipe-ingredient-tag">{{ recipe.ingredient_used }}使用</span>
+                {% endif %}
+            </div>
+            <div class="recipe-actions">
+                <a href="{{ recipe.url }}" target="_blank" class="btn btn-primary btn-sm btn-recipe">レシピを見る</a>
+                <button type="button" class="btn btn-outline-secondary btn-sm btn-recipe" 
+                        onclick="shareRecipe('{{ recipe.title }}', '{{ recipe.url }}')">シェア</button>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    
+    <div class="text-center mt-3">
+        <a href="{{ url_for('search') }}" class="btn btn-light btn-sm">
+            もっとレシピを探す →
+        </a>
+    </div>
+</div>
+{% endif %}
+
+<!-- クイックアクション -->
+<div class="section-card">
+    <div class="section-title">🚀 クイックアクション</div>
+    <div class="quick-actions">
+        <a href="{{ url_for('add_ingredient') }}" class="action-btn">
+            <span class="action-icon">➕</span>
+            <div>食材追加</div>
+        </a>
+        <a href="{{ url_for('search') }}" class="action-btn">
+            <span class="action-icon">🔍</span>
+            <div>レシピ検索</div>
+        </a>
+        <a href="{{ url_for('refrigerator') }}" class="action-btn">
+            <span class="action-icon">❄️</span>
+            <div>冷蔵庫</div>
+        </a>
+        <a href="{{ url_for('refrigerator', sort='expiry') }}" class="action-btn">
+            <span class="action-icon">⏰</span>
+            <div>期限順表示</div>
+        </a>
+    </div>
+</div>
+
+<!-- 使い方ガイド（初回のみ） -->
+{% if total_ingredients == 0 %}
+    <div class="section-card" style="background: linear-gradient(135deg, #17a2b8, #138496); color: white;">
+        <div class="section-title text-white">👋 はじめての方へ</div>
+        <div class="mb-3">
+            <h6>1. 食材を登録しよう</h6>
+            <p class="small mb-2">冷蔵庫にある食材を「追加」ページで登録してください。</p>
+            
+            <h6>2. レシピを検索しよう</h6>
+            <p class="small mb-2">登録した食材からおいしいレシピを見つけられます。</p>
+            
+            <h6>3. 賞味期限をチェック</h6>
+            <p class="small mb-0">期限が近い食材は自動でお知らせします。</p>
+        </div>
+        <a href="{{ url_for('add_ingredient') }}" class="btn btn-light">
+            今すぐ始める
+        </a>
+    </div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // レシピシェア機能
+    function shareRecipe(title, url) {
+        if (navigator.share) {
+            // Web Share API対応の場合
+            navigator.share({
+                title: title,
+                url: url
+            }).catch(console.error);
+        } else {
+            // フォールバック: クリップボードにコピー
+            const shareText = `${title}\n${url}`;
+            navigator.clipboard.writeText(shareText).then(() => {
+                // 簡単な通知表示
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = 'コピー完了!';
+                button.classList.add('btn-success');
+                button.classList.remove('btn-outline-secondary');
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.classList.remove('btn-success');
+                    button.classList.add('btn-outline-secondary');
+                }, 1500);
+            }).catch(() => {
+                // コピーに失敗した場合、URLを新しいタブで開く
+                window.open(url, '_blank');
+            });
+        }
+    }
+
+    // 画像読み込みエラーのハンドリング
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🏠 Dashboard loaded');
+        console.log('📊 Total ingredients:', {{ total_ingredients }});
+        console.log('🔔 Notifications:', {
+            expired: {{ notifications.expired|length }},
+            expiring_soon: {{ notifications.expiring_soon|length }},
+            expiring_week: {{ notifications.expiring_week|length }}
+        });
+        console.log('🍳 Recommended recipes:', {{ recommended_recipes|length }});
+
+        // 画像の遅延読み込み
+        const images = document.querySelectorAll('.recipe-image');
+        images.forEach(img => {
+            img.addEventListener('error', function() {
+                this.style.display = 'none';
+                const placeholder = this.nextElementSibling;
+                if (placeholder && placeholder.classList.contains('no-image-placeholder')) {
+                    placeholder.style.display = 'flex';
+                }
+            });
+        });
+
+        // レシピカードのクリック追跡
+        document.querySelectorAll('.recipe-card').forEach((card, index) => {
+            card.addEventListener('click', function(e) {
+                if (e.target.tagName !== 'A' && e.target.tagName !== 'BUTTON') {
+                    const link = this.querySelector('a[href]');
+                    if (link) {
+                        console.log(`Recipe card ${index + 1} clicked`);
+                        link.click();
+                    }
+                }
+            });
+        });
+    });
+
+    // パフォーマンス計測
+    window.addEventListener('load', function() {
+        console.log('📊 Dashboard performance:', {
+            loadTime: performance.now(),
+            recipes: {{ recommended_recipes|length }},
+            notifications: {{ (notifications.expired|length + notifications.expiring_soon|length + notifications.expiring_week|length) }}
+        });
+    });
+</script>
+{% endblock %}

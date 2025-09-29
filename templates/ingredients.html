@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>食材の管理</title>
+</head>
+<body>
+    <h1>食材の管理</h1>
+
+    <h2>登録済みの食材</h2>
+    <form method="POST" action="{{ url_for('search_selected') }}">
+        {% for ingredient in ingredients %}
+            <label>
+                <input type="checkbox" name="selected_ingredients" value="{{ ingredient.name }}">
+                {{ ingredient.name }}
+            </label><br>
+        {% endfor %}
+        <button type="submit">選択した食材でレシピ検索</button>
+    </form>
+
+    <hr>
+
+    <h2>新しい食材を追加</h2>
+    <form method="POST">
+        <input type="text" name="ingredient" placeholder="食材名を入力">
+        <button type="submit">追加</button>
+    </form>
+
+    <h2>食材を削除</h2>
+    <ul>
+        {% for ingredient in ingredients %}
+            <li>
+                {{ ingredient.name }} 
+                <a href="{{ url_for('delete_ingredient', id=ingredient.id) }}">[削除]</a>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <a href="{{ url_for('index') }}">← トップに戻る</a>
+</body>
+</html>
