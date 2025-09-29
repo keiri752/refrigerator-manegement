@@ -590,6 +590,123 @@ def change_quantity(id, action):
     return redirect(request.referrer or url_for('refrigerator'))
 
 
+# app.pyに以下のルートを追加
+
+@app.route('/bulk_delete', methods=['POST'])
+@login_required
+def bulk_delete():
+    user_id = session.get('user_id')
+    ingredient_ids = request.form.getlist('ingredient_ids[]')
+    
+    if not ingredient_ids:
+        flash('削除する食材を選択してください')
+        return redirect(url_for('refrigerator'))
+    
+    try:
+        # 選択された食材IDを整数に変換
+        ids = [int(id) for id in ingredient_ids]
+        
+        # ユーザーの食材のみを削除
+        deleted_count = Ingredient.query.filter(
+            Ingredient.id.in_(ids),
+            Ingredient.user_id == user_id
+        ).delete(synchronize_session=False)
+        
+        db.session.commit()
+        
+        print(f"[BULK_DELETE] User {user_id} deleted {deleted_count} ingredients")
+        flash(f'{deleted_count}件の食材を削除しました')
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"[ERROR] Bulk delete failed: {e}")
+        flash('一括削除中にエラーが発生しました')
+    
+    return redirect(url_for('refrigerator'))
+
+
+@app.route('/bulk_change_category', methods=['POST'])
+@login_required
+def bulk_change_category():
+    user_id = session.get('user_id')
+    ingredient_ids = request.form.getlist('ingredient_ids[]')
+    new_category = request.form.get('new_category', '').strip()
+    
+    if not ingredient_ids:
+        flash('カテゴリを変更する食材を選択してください')
+        return redirect(url_for('refrigerator'))
+    
+    if new_category not in PREDEFINED_CATEGORIES:
+        flash('無効なカテゴリです')
+        return redirect(url_for('refrigerator'))
+    
+    try:
+        # 選択された食材IDを整数に変換
+        ids = [int(id) for id in ingredient_ids]
+        
+        # ユーザーの食材のみを更新
+        updated_count = Ingredient.query.filter(
+            Ingredient.id.in_(ids),
+            Ingredient.user_id == user_id
+        ).update({'category': new_category}, synchronize_session=False)
+        
+        db.session.commit()
+        
+        print(f"[BULK_CATEGORY] User {user_id} updated {updated_count} ingredients to {new_category}")
+        flash(f'{updated_count}件の食材のカテゴリを「{new_category}」に変更しました')
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"[ERROR] Bulk category change failed: {e}")
+        flash('一括カテゴリ変更中にエラーが発生しました')
+    
+    return redirect(url_for('refrigerator'))
+
+
+@app.route('/bulk_change_quantity', methods=['POST'])
+@login_required
+def bulk_change_quantity():
+    user_id = session.get('user_id')
+    ingredient_ids = request.form.getlist('ingredient_ids[]')
+    action = request.form.get('action', 'set')  # 'set', 'add', 'subtract'
+    quantity_value = request.form.get('quantity_value', 1)
+    
+    if not ingredient_ids:
+        flash('数量を変更する食材を選択してください')
+        return redirect(url_for('refrigerator'))
+    
+    try:
+        quantity_value = int(quantity_value)
+        ids = [int(id) for id in ingredient_ids]
+        
+        ingredients = Ingredient.query.filter(
+            Ingredient.id.in_(ids),
+            Ingredient.user_id == user_id
+        ).all()
+        
+        updated_count = 0
+        for ing in ingredients:
+            if action == 'set':
+                ing.quantity = max(1, quantity_value)
+            elif action == 'add':
+                ing.quantity += quantity_value
+            elif action == 'subtract':
+                ing.quantity = max(1, ing.quantity - quantity_value)
+            updated_count += 1
+        
+        db.session.commit()
+        
+        print(f"[BULK_QUANTITY] User {user_id} updated {updated_count} ingredients")
+        flash(f'{updated_count}件の食材の数量を変更しました')
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"[ERROR] Bulk quantity change failed: {e}")
+        flash('一括数量変更中にエラーが発生しました')
+    
+    return redirect(url_for('refrigerator'))
+
+
 
 @app.route('/edit_category/<int:id>', methods=['POST'])
 @login_required  

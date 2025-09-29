@@ -22,6 +22,12 @@
     {% endif %}
 
     <div class="ingredient-controls" id="ingredient-{{ ing.id }}">
+        <!-- チェックボックス -->
+        <input type="checkbox" 
+               class="ingredient-checkbox" 
+               data-ingredient-id="{{ ing.id }}"
+               id="checkbox-{{ ing.id }}">
+        
         <div style="flex: 1;">
             <div class="ingredient-name {{ color_class }}">
                 {{ ing.name }}

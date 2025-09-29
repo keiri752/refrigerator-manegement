@@ -13,6 +13,18 @@
         padding: 12px;
         border-radius: 8px;
         margin-bottom: 8px;
+        transition: background-color 0.2s;
+    }
+
+    .ingredient-controls.selected {
+        background: #e3f2fd;
+        border: 2px solid #2196f3;
+    }
+    
+    .ingredient-checkbox {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
     }
     
     .ingredient-name {
@@ -67,6 +79,119 @@
         font-size: 3rem;
         margin-bottom: 15px;
         opacity: 0.5;
+    }
+
+    /* 一括操作バー */
+    .bulk-actions-bar {
+        position: sticky;
+        top: 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 15px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        display: none;
+        z-index: 100;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .bulk-actions-bar.active {
+        display: block;
+        animation: slideDown 0.3s ease-out;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .bulk-actions-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .selected-count {
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .bulk-action-buttons {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .bulk-action-buttons .btn {
+        font-size: 0.85rem;
+        padding: 8px 15px;
+        border: none;
+        background: rgba(255,255,255,0.2);
+        color: white;
+        backdrop-filter: blur(10px);
+    }
+
+    .bulk-action-buttons .btn:hover {
+        background: rgba(255,255,255,0.3);
+    }
+
+    .bulk-action-buttons .btn-danger {
+        background: rgba(244,67,54,0.8);
+    }
+
+    .bulk-action-buttons .btn-danger:hover {
+        background: rgba(244,67,54,1);
+    }
+
+    /* モーダルスタイル */
+    .bulk-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .bulk-modal.active {
+        display: flex;
+    }
+
+    .bulk-modal-content {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        max-width: 500px;
+        width: 90%;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+
+    .bulk-modal-header {
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    .bulk-modal-body {
+        margin-bottom: 20px;
+    }
+
+    .bulk-modal-footer {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
     }
 
     /* タブスタイル */
@@ -159,6 +284,12 @@
         color: #6c757d;
     }
 
+    .select-all-btn {
+        font-size: 0.8rem;
+        padding: 4px 10px;
+        margin-left: 10px;
+    }
+
     /* レスポンシブ対応 */
     @media (max-width: 768px) {
         .category-tabs {
@@ -168,6 +299,15 @@
         .category-tab {
             font-size: 0.8rem;
             padding: 6px 12px;
+        }
+
+        .bulk-action-buttons {
+            justify-content: center;
+        }
+
+        .bulk-action-buttons .btn {
+            flex: 1;
+            min-width: 100px;
         }
     }
 
@@ -192,9 +332,35 @@
 
 {% block content %}
 {% if ingredients %}
+    <!-- 一括操作バー -->
+    <div class="bulk-actions-bar" id="bulkActionsBar">
+        <div class="bulk-actions-header">
+            <div class="selected-count">
+                <span id="selectedCount">0</span>件選択中
+            </div>
+            <button class="btn btn-sm btn-light" onclick="clearSelection()">選択解除</button>
+        </div>
+        <div class="bulk-action-buttons">
+            <button class="btn btn-sm" onclick="openBulkCategoryModal()">
+                📂 カテゴリ変更
+            </button>
+            <button class="btn btn-sm" onclick="openBulkQuantityModal()">
+                🔢 数量変更
+            </button>
+            <button class="btn btn-sm btn-danger" onclick="bulkDelete()">
+                🗑️ 一括削除
+            </button>
+        </div>
+    </div>
+
     <!-- ソートボタン -->
     <div class="section-card">
-        <div class="section-title">🔧 表示順序</div>
+        <div class="section-title">
+            🔧 表示順序
+            <button class="btn btn-sm btn-outline-primary select-all-btn" onclick="toggleSelectAll()">
+                <span id="selectAllText">全選択</span>
+            </button>
+        </div>
         <div class="sort-buttons">
             <a href="{{ url_for('refrigerator') }}" 
                class="btn {{ 'btn-primary' if not sort else 'btn-outline-secondary' }} btn-sm">
@@ -218,13 +384,11 @@
     <!-- カテゴリタブ -->
     <div class="section-card">
         <div class="category-tabs">
-            <!-- 全て表示タブ -->
             <button class="category-tab all-tab active" onclick="showCategory('all')">
                 📦 すべて
                 <span class="badge">{{ ingredients|length }}</span>
             </button>
             
-            <!-- カテゴリ別タブ -->
             {% for category in all_categories %}
                 {% set category_items = grouped.get(category, []) %}
                 {% if category_items %}
@@ -357,102 +521,223 @@
     </div>
 {% endif %}
 
-<!-- 食材リストのテンプレート（インクルード用） -->
-<script id="ingredient-list-template" type="text/template">
-    {% for ing in items %}
-        {% set color_class = "" %}
-        {% set status_text = "" %}
-        {% if ing.expiry_date %}
-            {% set days_left = (ing.expiry_date - date.today()).days %}
-            {% if days_left < 0 %}
-                {% set color_class = "text-danger fw-bold" %}
-                {% set status_text = "期限切れ" %}
-            {% elif days_left == 0 %}
-                {% set color_class = "text-danger fw-bold" %}
-                {% set status_text = "今日まで" %}
-            {% elif days_left <= 3 %}
-                {% set color_class = "text-danger" %}
-                {% set status_text = days_left ~ "日後" %}
-            {% elif days_left <= 7 %}
-                {% set color_class = "text-warning" %}
-                {% set status_text = days_left ~ "日後" %}
-            {% else %}
-                {% set color_class = "text-success" %}
-                {% set status_text = days_left ~ "日後" %}
-            {% endif %}
-        {% endif %}
-
-        <div class="ingredient-controls" id="ingredient-{{ ing.id }}">
-            <div style="flex: 1;">
-                <div class="ingredient-name {{ color_class }}">
-                    {{ ing.name }}
-                    <button type="button" 
-                            class="btn btn-sm btn-outline-secondary ms-2" 
-                            onclick="toggleCategoryEdit({{ ing.id }})"
-                            title="カテゴリを変更">
-                        🏷️
-                    </button>
-                </div>
-                
-                <!-- カテゴリ表示/編集 -->
-                <div class="ingredient-category">
-                    <span class="category-display-{{ ing.id }}">
-                        <small class="text-muted">📂 {{ ing.category }}</small>
-                    </span>
-                    
-                    <!-- カテゴリ編集フォーム -->
-                    <form class="category-edit-form-{{ ing.id }} d-none" 
-                          action="{{ url_for('edit_category', id=ing.id) }}" 
-                          method="post" 
-                          style="display: inline;">
-                        <select name="category" class="form-select form-select-sm d-inline-block w-auto">
-                            {% for cat in all_categories %}
-                            <option value="{{ cat }}" {% if cat == ing.category %}selected{% endif %}>
-                                {{ cat }}
-                            </option>
-                            {% endfor %}
-                        </select>
-                        <button type="submit" class="btn btn-sm btn-success">保存</button>
-                        <button type="button" 
-                                class="btn btn-sm btn-secondary" 
-                                onclick="toggleCategoryEdit({{ ing.id }})">
-                            キャンセル
-                        </button>
-                    </form>
-                </div>
-                
-                <div class="ingredient-info">
-                    {% if ing.expiry_date %}
-                        {{ ing.expiry_date.strftime("%Y/%m/%d") }} ({{ status_text }})
-                    {% else %}
-                        賞味期限未設定
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- 数量コントロール -->
-            <div class="quantity-controls">
-                <form action="{{ url_for('change_quantity', id=ing.id, action='minus') }}" method="post" style="display:inline;">
-                    <button type="submit" class="btn btn-outline-secondary btn-sm btn-quantity">−</button>
-                </form>
-                <span class="mx-2 fw-bold">{{ ing.quantity }}</span>
-                <form action="{{ url_for('change_quantity', id=ing.id, action='plus') }}" method="post" style="display:inline;">
-                    <button type="submit" class="btn btn-outline-secondary btn-sm btn-quantity">+</button>
-                </form>
-                <a href="{{ url_for('delete_ingredient', id=ing.id) }}" 
-                   class="btn btn-outline-danger btn-sm ms-2"
-                   onclick="return confirm('{{ ing.name }}を削除しますか？')">🗑</a>
-            </div>
+<!-- カテゴリ変更モーダル -->
+<div class="bulk-modal" id="bulkCategoryModal">
+    <div class="bulk-modal-content">
+        <div class="bulk-modal-header">カテゴリを一括変更</div>
+        <div class="bulk-modal-body">
+            <form id="bulkCategoryForm" method="POST" action="{{ url_for('bulk_change_category') }}">
+                <label class="form-label">変更先のカテゴリ</label>
+                <select name="new_category" class="form-select" required>
+                    {% for cat in all_categories %}
+                    <option value="{{ cat }}">{{ cat }}</option>
+                    {% endfor %}
+                </select>
+                <input type="hidden" name="ingredient_ids[]" id="bulkCategoryIds">
+            </form>
         </div>
-    {% endfor %}
-</script>
+        <div class="bulk-modal-footer">
+            <button class="btn btn-secondary" onclick="closeBulkCategoryModal()">キャンセル</button>
+            <button class="btn btn-primary" onclick="submitBulkCategory()">変更</button>
+        </div>
+    </div>
+</div>
+
+<!-- 数量変更モーダル -->
+<div class="bulk-modal" id="bulkQuantityModal">
+    <div class="bulk-modal-content">
+        <div class="bulk-modal-header">数量を一括変更</div>
+        <div class="bulk-modal-body">
+            <form id="bulkQuantityForm" method="POST" action="{{ url_for('bulk_change_quantity') }}">
+                <label class="form-label">操作</label>
+                <select name="action" class="form-select mb-3">
+                    <option value="set">指定の数量に設定</option>
+                    <option value="add">現在の数量に加算</option>
+                    <option value="subtract">現在の数量から減算</option>
+                </select>
+                
+                <label class="form-label">数量</label>
+                <input type="number" name="quantity_value" class="form-control" value="1" min="1" max="99" required>
+                
+                <input type="hidden" name="ingredient_ids[]" id="bulkQuantityIds">
+            </form>
+        </div>
+        <div class="bulk-modal-footer">
+            <button class="btn btn-secondary" onclick="closeBulkQuantityModal()">キャンセル</button>
+            <button class="btn btn-primary" onclick="submitBulkQuantity()">変更</button>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
+    // 選択された食材のIDを保持
+    let selectedIngredients = new Set();
+
+    // チェックボックスの変更を監視
+    function toggleIngredientSelection(checkbox, ingredientId) {
+        const ingredientElement = checkbox.closest('.ingredient-controls');
+        
+        if (checkbox.checked) {
+            selectedIngredients.add(ingredientId);
+            ingredientElement.classList.add('selected');
+        } else {
+            selectedIngredients.delete(ingredientId);
+            ingredientElement.classList.remove('selected');
+        }
+        
+        updateBulkActionsBar();
+    }
+
+    // 一括操作バーの表示/非表示
+    function updateBulkActionsBar() {
+        const bar = document.getElementById('bulkActionsBar');
+        const count = document.getElementById('selectedCount');
+        
+        count.textContent = selectedIngredients.size;
+        
+        if (selectedIngredients.size > 0) {
+            bar.classList.add('active');
+        } else {
+            bar.classList.remove('active');
+        }
+    }
+
+    // 全選択/解除
+    function toggleSelectAll() {
+        const checkboxes = document.querySelectorAll('.ingredient-checkbox:not([disabled])');
+        const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+        
+        checkboxes.forEach(checkbox => {
+            const ingredientId = parseInt(checkbox.dataset.ingredientId);
+            
+            if (allChecked) {
+                checkbox.checked = false;
+                selectedIngredients.delete(ingredientId);
+                checkbox.closest('.ingredient-controls').classList.remove('selected');
+            } else {
+                checkbox.checked = true;
+                selectedIngredients.add(ingredientId);
+                checkbox.closest('.ingredient-controls').classList.add('selected');
+            }
+        });
+        
+        document.getElementById('selectAllText').textContent = allChecked ? '全選択' : '選択解除';
+        updateBulkActionsBar();
+    }
+
+    // 選択解除
+    function clearSelection() {
+        document.querySelectorAll('.ingredient-checkbox').forEach(checkbox => {
+            checkbox.checked = false;
+            checkbox.closest('.ingredient-controls').classList.remove('selected');
+        });
+        selectedIngredients.clear();
+        updateBulkActionsBar();
+        document.getElementById('selectAllText').textContent = '全選択';
+    }
+
+    // 一括削除
+    function bulkDelete() {
+        if (selectedIngredients.size === 0) {
+            alert('削除する食材を選択してください');
+            return;
+        }
+        
+        if (!confirm(`${selectedIngredients.size}件の食材を削除しますか？この操作は取り消せません。`)) {
+            return;
+        }
+        
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{{ url_for("bulk_delete") }}';
+        
+        selectedIngredients.forEach(id => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'ingredient_ids[]';
+            input.value = id;
+            form.appendChild(input);
+        });
+        
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+    // カテゴリ変更モーダル
+    function openBulkCategoryModal() {
+        if (selectedIngredients.size === 0) {
+            alert('カテゴリを変更する食材を選択してください');
+            return;
+        }
+        document.getElementById('bulkCategoryModal').classList.add('active');
+    }
+
+    function closeBulkCategoryModal() {
+        document.getElementById('bulkCategoryModal').classList.remove('active');
+    }
+
+    function submitBulkCategory() {
+        const form = document.getElementById('bulkCategoryForm');
+        
+        // 既存の隠しフィールドを削除
+        form.querySelectorAll('input[name="ingredient_ids[]"]').forEach(el => el.remove());
+        
+        // 選択された食材IDを追加
+        selectedIngredients.forEach(id => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'ingredient_ids[]';
+            input.value = id;
+            form.appendChild(input);
+        });
+        
+        form.submit();
+    }
+
+    // 数量変更モーダル
+    function openBulkQuantityModal() {
+        if (selectedIngredients.size === 0) {
+            alert('数量を変更する食材を選択してください');
+            return;
+        }
+        document.getElementById('bulkQuantityModal').classList.add('active');
+    }
+
+    function closeBulkQuantityModal() {
+        document.getElementById('bulkQuantityModal').classList.remove('active');
+    }
+
+    function submitBulkQuantity() {
+        const form = document.getElementById('bulkQuantityForm');
+        
+        // 既存の隠しフィールドを削除
+        form.querySelectorAll('input[name="ingredient_ids[]"]').forEach(el => el.remove());
+        
+        // 選択された食材IDを追加
+        selectedIngredients.forEach(id => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'ingredient_ids[]';
+            input.value = id;
+            form.appendChild(input);
+        });
+        
+        form.submit();
+    }
+
+    // モーダル外クリックで閉じる
+    document.querySelectorAll('.bulk-modal').forEach(modal => {
+        modal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.remove('active');
+            }
+        });
+    });
+
     // タブ切り替え機能
     function showCategory(categoryName) {
-        // 全てのタブとセクションから active クラスを削除
         document.querySelectorAll('.category-tab').forEach(tab => {
             tab.classList.remove('active');
         });
@@ -461,7 +746,6 @@
             section.classList.remove('active');
         });
         
-        // 選択されたタブとセクションに active クラスを追加
         event.target.classList.add('active');
         document.getElementById('category-' + categoryName).classList.add('active');
         
@@ -475,18 +759,15 @@
         
         if (displayElement && formElement) {
             if (formElement.classList.contains('d-none')) {
-                // 編集モードに切り替え
                 displayElement.style.display = 'none';
                 formElement.classList.remove('d-none');
                 formElement.style.display = 'inline';
                 
-                // セレクトボックスにフォーカス
                 const selectElement = formElement.querySelector('select');
                 if (selectElement) {
                     selectElement.focus();
                 }
             } else {
-                // 表示モードに戻す
                 displayElement.style.display = 'inline';
                 formElement.classList.add('d-none');
                 formElement.style.display = 'none';
@@ -497,7 +778,12 @@
     // キーボードショートカット
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
-            // すべての編集フォームを閉じる
+            // モーダルを閉じる
+            document.querySelectorAll('.bulk-modal').forEach(modal => {
+                modal.classList.remove('active');
+            });
+            
+            // 編集フォームを閉じる
             document.querySelectorAll('[class*="category-edit-form-"]').forEach(form => {
                 if (!form.classList.contains('d-none')) {
                     const ingredientId = form.className.match(/category-edit-form-(\d+)/)[1];
@@ -506,7 +792,16 @@
             });
         }
         
-        // 数字キーでタブ切り替え（1-7）
+        // Ctrl/Cmd + A で全選択
+        if ((e.ctrlKey || e.metaKey) && e.key === 'a') {
+            const focusedElement = document.activeElement;
+            if (focusedElement.tagName !== 'INPUT' && focusedElement.tagName !== 'TEXTAREA') {
+                e.preventDefault();
+                toggleSelectAll();
+            }
+        }
+        
+        // 数字キーでタブ切り替え
         if (e.key >= '1' && e.key <= '7') {
             const tabs = document.querySelectorAll('.category-tab');
             const index = parseInt(e.key) - 1;
@@ -517,8 +812,15 @@
     });
 
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('❄️ Refrigerator page with tabs loaded');
+        console.log('❄️ Refrigerator page with bulk operations loaded');
         console.log('📦 Total ingredients:', {{ ingredients|length }});
+        
+        // チェックボックスのイベントリスナー設定
+        document.querySelectorAll('.ingredient-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                toggleIngredientSelection(this, parseInt(this.dataset.ingredientId));
+            });
+        });
         
         // カテゴリ別の統計を計算
         const categoryStats = {};
@@ -530,16 +832,6 @@
         {% endfor %}
         
         console.log('📊 Category stats:', categoryStats);
-        
-        // タブのツールチップ設定
-        document.querySelectorAll('.category-tab').forEach(tab => {
-            tab.addEventListener('mouseenter', function() {
-                const categoryName = this.textContent.trim().split(' ')[0];
-                if (categoryStats[categoryName]) {
-                    this.title = `${categoryName}: ${categoryStats[categoryName].count}種類, 合計${categoryStats[categoryName].totalQuantity}個`;
-                }
-            });
-        });
     });
 
     // タッチデバイス対応のスワイプ機能
@@ -562,18 +854,16 @@
         const currentIndex = tabs.indexOf(activeTab);
         
         if (touchEndX < touchStartX - swipeThreshold) {
-            // 左スワイプ - 次のタブ
             if (currentIndex < tabs.length - 1) {
                 tabs[currentIndex + 1].click();
             }
         }
         
         if (touchEndX > touchStartX + swipeThreshold) {
-            // 右スワイプ - 前のタブ
             if (currentIndex > 0) {
                 tabs[currentIndex - 1].click();
             }
         }
     }
-</script>
+    </script>
 {% endblock %}
