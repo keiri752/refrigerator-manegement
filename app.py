@@ -656,15 +656,21 @@ def debug():
     return f"<pre>{json.dumps(debug_info, indent=2, ensure_ascii=False)}</pre>"
 
 # データベースマイグレーション関数
+# データベースマイグレーション関数
 def migrate_database():
     """既存データベースにcategoryカラムを追加"""
     try:
-        # カラムが存在するかチェック
-        result = db.engine.execute("PRAGMA table_info(ingredient)")
-        columns = [row[1] for row in result]
+        from sqlalchemy import text, inspect
+        
+        # インスペクタを使用してカラムの存在を確認
+        inspector = inspect(db.engine)
+        columns = [col['name'] for col in inspector.get_columns('ingredient')]
         
         if 'category' not in columns:
-            db.engine.execute('ALTER TABLE ingredient ADD COLUMN category VARCHAR(20)')
+            # text()を使用してSQL文を実行
+            with db.engine.connect() as conn:
+                conn.execute(text('ALTER TABLE ingredient ADD COLUMN category VARCHAR(20)'))
+                conn.commit()
             print("[MIGRATION] categoryカラムを追加しました")
         else:
             print("[MIGRATION] categoryカラムは既に存在します")
