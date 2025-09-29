@@ -39,7 +39,7 @@
                     <small class="text-muted">📂 {{ ing.category }}</small>
                 </span>
                 
-                <!-- カテゴリ編集フォーム（初期は非表示） -->
+                <!-- カテゴリ編集フォーム -->
                 <form class="category-edit-form-{{ ing.id }} d-none" 
                       action="{{ url_for('edit_category', id=ing.id) }}" 
                       method="post" 

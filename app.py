@@ -589,7 +589,7 @@ def change_quantity(id, action):
     
     return redirect(request.referrer or url_for('refrigerator'))
 
-# app.py にこの関数を追加します
+
 
 @app.route('/edit_category/<int:id>', methods=['POST'])
 @login_required  

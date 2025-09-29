@@ -282,3 +282,4 @@ console.log('🚀 Service Worker (Multi-page v2): Script loaded successfully');
 console.log('📋 User data cache prevention: ENABLED');
 console.log('🔍 Search page caching: CONDITIONAL (GET only)');
 console.log('📱 Multi-page navigation support: ENABLED');
+// レシピお気に入り機能追加予定
