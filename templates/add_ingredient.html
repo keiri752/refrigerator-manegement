@@ -5,13 +5,7 @@
 
 {% block extra_css %}
 <style>
-    .add-form-card {
-        background: linear-gradient(135deg, #28a745, #20c997);
-        color: white;
-        border-radius: 12px;
-        padding: 25px;
-        margin-bottom: 20px;
-    }
+   
 
     .add-form-card .form-label {
         color: rgb(0, 0, 0);
@@ -153,6 +147,142 @@
     .recent-item:hover {
         background: #e9ecef;
     }
+
+    /* メインの登録ボタンに立体感を追加 */
+    .add-form-card .btn-light {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 
+                    0 1px 3px rgba(0, 0, 0, 0.08);
+        transform: translateY(0);
+        transition: all 0.2s ease;
+        background: linear-gradient(to bottom, #ffffff, #f8f9fa);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .add-form-card .btn-light:hover {
+        box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15), 
+                    0 2px 4px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+        background: linear-gradient(to bottom, #ffffff, #ffffff);
+    }
+    
+    .add-form-card .btn-light:active {
+        box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1) inset;
+        transform: translateY(1px);
+    }
+
+    /* 数量調整ボタンに立体感を追加 */
+    .add-form-card .btn-outline-light {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transform: translateY(0);
+        transition: all 0.15s ease;
+        background: rgba(255, 255, 255, 0.9);
+        border: 2px solid rgba(255, 255, 255, 0.5);
+        color: black;
+    }
+    
+    .add-form-card .btn-outline-light:hover {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+        transform: translateY(-1px);
+        background: rgba(255, 255, 255, 1);
+        color: black;
+    }
+    
+    .add-form-card .btn-outline-light:active {
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
+        transform: translateY(1px);
+    }
+
+    /* クイック設定ボタンに立体感を追加（base.htmlのログアウトボタンと同じスタイル） */
+    .btn-sm.btn-outline-light {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        transform: translateY(0);
+        transition: all 0.2s ease;
+        background: white;
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        color: black;
+        font-weight: 500;
+    }
+    
+    .btn-sm.btn-outline-light:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+        transform: translateY(-2px);
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.8);
+        color: white;
+    }
+    
+    .btn-sm.btn-outline-light:active {
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
+        transform: translateY(0);
+        background: rgba(255, 255, 255, 0.15);
+    }
+
+    /* よく使う食材ボタンにも立体感を追加 */
+    .quick-add-btn {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        transform: translateY(0);
+        transition: all 0.2s ease;
+    }
+    
+    .quick-add-btn:hover {
+        box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+        transform: translateY(-2px);
+    }
+    
+    .quick-add-btn:active {
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
+        transform: translateY(0);
+    }
+
+    /* アクションボタンにも立体感を追加 */
+    .section-card .btn {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transform: translateY(0);
+        transition: all 0.2s ease;
+    }
+    
+    .section-card .btn:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
+    }
+    
+    .section-card .btn:active {
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
+        transform: translateY(1px);
+    }
+
+    /* ボタン押下時のアニメーション強化 */
+    .btn-light span {
+        display: inline-block;
+        transition: transform 0.1s ease;
+    }
+    
+    .btn-light:active span {
+        transform: scale(0.98);
+    }
+
+.add-form-card {
+        background: linear-gradient(135deg, #28a745, #20c997) !important;
+        color: white;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 20px;
+    }
+
+ .add-form-card {
+        background: linear-gradient(135deg, #28a745, #20c997) !important;
+        color: white;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 20px;
+    }
+/* 未設定メッセージとクイック設定のテキストの色とサイズ */
+.add-form-card small,
+.add-form-card .text-white-50 {
+    color: rgb(255, 255, 255) !important;
+    font-size: 0.9rem !important;
+}
+
 </style>
 {% endblock %}
 
@@ -177,25 +307,25 @@
             <div class="col-md-6">
                 <label for="quantity" class="form-label">数量</label>
                 <div class="input-group">
-                    <button type="button" class="btn btn-outline-light" onclick="changeQuantity(-1)">−</button>
+                    <button type="button" class="btn btn-outline-light text-dark" onclick="changeQuantity(-1)">−</button>
                     <input type="number" name="quantity" id="quantity" value="1" min="1" max="99" class="form-control text-center">
-                    <button type="button" class="btn btn-outline-light" onclick="changeQuantity(1)">+</button>
+                    <button type="button" class="btn btn-outline-light text-dark" onclick="changeQuantity(1)">+</button>
                 </div>
             </div>
 
-<div class="col-md-6">
-    <label for="category" class="form-label">カテゴリ</label>
-    <select name="category" id="category" class="form-control" required>
-        <option value="">カテゴリを選択してください</option>
-        <option value="野菜">野菜</option>
-        <option value="肉類">肉類</option>
-        <option value="魚介類">魚介類</option>
-        <option value="乳製品">乳製品</option>
-        <option value="穀類">穀類</option>
-        <option value="調味料">調味料</option>
-        <option value="その他">その他</option>
-    </select>
-</div>
+            <div class="col-md-6">
+                <label for="category" class="form-label">カテゴリ</label>
+                <select name="category" id="category" class="form-control" required>
+                    <option value="">カテゴリを選択してください</option>
+                    <option value="野菜">野菜</option>
+                    <option value="肉類">肉類</option>
+                    <option value="魚介類">魚介類</option>
+                    <option value="乳製品">乳製品</option>
+                    <option value="穀類">穀類</option>
+                    <option value="調味料">調味料</option>
+                    <option value="その他">その他</option>
+                </select>
+            </div>
             
             <div class="col-12">
                 <button type="submit" class="btn btn-light w-100">
@@ -282,7 +412,6 @@
 
 {% block extra_js %}
 <script>
-
     // 数量変更ボタン
     function changeQuantity(delta) {
         const quantityInput = document.getElementById('quantity');
@@ -295,90 +424,91 @@
         quantityInput.value = newValue;
     }
     
- // 食材とカテゴリのマッピング（詳細版）
-const ingredientCategories = {
-    // 野菜
-    'にんじん': '野菜',
-    'たまねぎ': '野菜', 
-    'じゃがいも': '野菜',
-    'キャベツ': '野菜',
-    'トマト': '野菜',
-    'もやし': '野菜',
-    'きゅうり': '野菜',
-    'なす': '野菜',
-    'ピーマン': '野菜',
-    'レタス': '野菜',
-    
-    // 肉類
-    '豚肉': '肉類',
-    '鶏肉': '肉類', 
-    '牛肉': '肉類',
-    'ひき肉': '肉類',
-    'ベーコン': '肉類',
-    'ハム': '肉類',
-    
-    // 魚介類
-    'さば': '魚介類',
-    'さけ': '魚介類',
-    'まぐろ': '魚介類',
-    'えび': '魚介類',
-    'いか': '魚介類',
-    
-    // 乳製品
-    '卵': '乳製品',
-    '牛乳': '乳製品',
-    'バター': '乳製品',
-    'チーズ': '乳製品',
-    'ヨーグルト': '乳製品',
-    
-    // 穀類
-    '米': '穀類',
-    'パン': '穀類',
-    'パスタ': '穀類',
-    'うどん': '穀類',
-    
-    // 調味料
-    '醤油': '調味料',
-    '味噌': '調味料',
-    '塩': '調味料',
-    '砂糖': '調味料',
-    'サラダ油': '調味料',
-    
-    // その他
-    '豆腐': 'その他',
-    '納豆': 'その他'
-};
+    // 食材とカテゴリのマッピング（詳細版）
+    const ingredientCategories = {
+        // 野菜
+        'にんじん': '野菜',
+        'たまねぎ': '野菜', 
+        'じゃがいも': '野菜',
+        'キャベツ': '野菜',
+        'トマト': '野菜',
+        'もやし': '野菜',
+        'きゅうり': '野菜',
+        'なす': '野菜',
+        'ピーマン': '野菜',
+        'レタス': '野菜',
+        
+        // 肉類
+        '豚肉': '肉類',
+        '鶏肉': '肉類', 
+        '牛肉': '肉類',
+        'ひき肉': '肉類',
+        'ベーコン': '肉類',
+        'ハム': '肉類',
+        
+        // 魚介類
+        'さば': '魚介類',
+        'さけ': '魚介類',
+        'まぐろ': '魚介類',
+        'えび': '魚介類',
+        'いか': '魚介類',
+        
+        // 乳製品
+        '卵': '乳製品',
+        '牛乳': '乳製品',
+        'バター': '乳製品',
+        'チーズ': '乳製品',
+        'ヨーグルト': '乳製品',
+        
+        // 穀類
+        '米': '穀類',
+        'パン': '穀類',
+        'パスタ': '穀類',
+        'うどん': '穀類',
+        
+        // 調味料
+        '醤油': '調味料',
+        '味噌': '調味料',
+        '塩': '調味料',
+        '砂糖': '調味料',
+        'サラダ油': '調味料',
+        
+        // その他
+        '豆腐': 'その他',
+        '納豆': 'その他'
+    };
 
-function quickAdd(ingredientName) {
-    const ingredientInput = document.getElementById('ingredient');
-    const categorySelect = document.getElementById('category');
-    
-    // 食材名を設定
-    ingredientInput.value = ingredientName;
-    
-    // 自動カテゴリ設定
-    if (ingredientCategories[ingredientName]) {
-        categorySelect.value = ingredientCategories[ingredientName];
+    function quickAdd(ingredientName) {
+        const ingredientInput = document.getElementById('ingredient');
+        const categorySelect = document.getElementById('category');
         
-        // カテゴリ設定の視覚的フィードバック
-        categorySelect.style.backgroundColor = '#d4edda';
-        categorySelect.style.border = '2px solid #28a745';
+        // 食材名を設定
+        ingredientInput.value = ingredientName;
         
+        // 自動カテゴリ設定
+        if (ingredientCategories[ingredientName]) {
+            categorySelect.value = ingredientCategories[ingredientName];
+            
+            // カテゴリ設定の視覚的フィードバック
+            categorySelect.style.backgroundColor = '#d4edda';
+            categorySelect.style.border = '2px solid #28a745';
+            
+            setTimeout(() => {
+                categorySelect.style.backgroundColor = '';
+                categorySelect.style.border = '';
+            }, 1000);
+        }
+        
+        // 食材名の視覚的フィードバック
+        ingredientInput.style.backgroundColor = '#e3f2fd';
         setTimeout(() => {
-            categorySelect.style.backgroundColor = '';
-            categorySelect.style.border = '';
-        }, 1000);
+            ingredientInput.style.backgroundColor = '';
+        }, 500);
+        
+        // 入力フィールドにフォーカス
+        ingredientInput.focus();
     }
-    
-    // 食材名の視覚的フィードバック
-    ingredientInput.style.backgroundColor = '#e3f2fd';
-    setTimeout(() => {
-        ingredientInput.style.backgroundColor = '';
-    }, 500);
-    
-    // 入力フィールドにフォーカス（）
-    ingredientInput.focus();
-}
+
     // 今日の日付を賞味期限の初期値に設定（オプション）
     function setDefaultExpiry(days = 7) {
         const expiryInput = document.getElementById('expiry_date');
@@ -394,10 +524,10 @@ function quickAdd(ingredientName) {
         const quickExpiryDiv = document.createElement('div');
         quickExpiryDiv.className = 'mt-1';
         quickExpiryDiv.innerHTML = `
-            <small class="text-black-50">クイック設定: </small>
-            <button type="button" class="btn btn-sm btn-outline-light text-dark me-1" onclick="setDefaultExpiry(3)">3日後</button>
-            <button type="button" class="btn btn-sm btn-outline-light text-dark me-1" onclick="setDefaultExpiry(7)">1週間</button>
-            <button type="button" class="btn btn-sm btn-outline-light text-dark" onclick="setDefaultExpiry(14)">2週間</button>
+            <small class="text-white-50">クイック設定: </small>
+            <button type="button" class="btn btn-sm btn-outline-light me-1" onclick="setDefaultExpiry(3)">3日後</button>
+            <button type="button" class="btn btn-sm btn-outline-light me-1" onclick="setDefaultExpiry(7)">1週間</button>
+            <button type="button" class="btn btn-sm btn-outline-light" onclick="setDefaultExpiry(14)">2週間</button>
         `;
         expiryInput.parentNode.appendChild(quickExpiryDiv);
     });
