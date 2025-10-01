@@ -59,6 +59,32 @@ class Ingredient(db.Model):
     category = db.Column(db.String(50), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
+# お気に入りレシピ
+class FavoriteRecipe(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    title = db.Column(db.String(200), nullable=False)
+    url = db.Column(db.String(500), nullable=False)
+    img = db.Column(db.String(500), nullable=True)
+    source = db.Column(db.String(50), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # ユーザーとのリレーション
+    user = db.relationship('User', backref=db.backref('favorites', lazy=True))
+
+# レシピ閲覧履歴
+class RecipeHistory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    title = db.Column(db.String(200), nullable=False)
+    url = db.Column(db.String(500), nullable=False)
+    img = db.Column(db.String(500), nullable=True)
+    source = db.Column(db.String(50), nullable=False)
+    viewed_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # ユーザーとのリレーション
+    user = db.relationship('User', backref=db.backref('history', lazy=True))
+
 with app.app_context():
     db.create_all()
 
@@ -485,11 +511,252 @@ def search():
                 results = []
     
     ingredients = Ingredient.query.filter_by(user_id=user_id).all()
+    favorite_urls = get_favorite_urls(user_id)
     
     return render_template('search.html', 
                          ingredients=ingredients, 
-                         results=results, 
+                         results=results,
+                         favorite_urls=favorite_urls, 
                          date=date)
+
+
+
+# ---------- お気に入り機能 ----------
+
+@app.route('/add_favorite', methods=['POST'])
+@login_required
+def add_favorite():
+    """お気に入りに追加"""
+    user_id = session.get('user_id')
+    title = request.form.get('title', '').strip()
+    url = request.form.get('url', '').strip()
+    img = request.form.get('img', '').strip()
+    source = request.form.get('source', '').strip()
+    
+    if not title or not url or not source:
+        flash('レシピ情報が不完全です')
+        return redirect(request.referrer or url_for('search'))
+    
+    # 重複チェック（同じURLが既に登録されているか）
+    exists = FavoriteRecipe.query.filter_by(
+        user_id=user_id, 
+        url=url
+    ).first()
+    
+    if exists:
+        flash('このレシピは既にお気に入りに登録されています')
+    else:
+        try:
+            favorite = FavoriteRecipe(
+                user_id=user_id,
+                title=title,
+                url=url,
+                img=img,
+                source=source
+            )
+            db.session.add(favorite)
+            db.session.commit()
+            print(f"[FAVORITE] Added: '{title}' by user {user_id}")
+            flash(f'「{title}」をお気に入りに追加しました')
+        except Exception as e:
+            db.session.rollback()
+            print(f"[ERROR] Add favorite failed: {e}")
+            flash('お気に入りの追加中にエラーが発生しました')
+    
+    return redirect(request.referrer or url_for('search'))
+
+
+@app.route('/favorites')
+@login_required
+def favorites():
+    """お気に入り一覧"""
+    user_id = session.get('user_id')
+    favorites = FavoriteRecipe.query.filter_by(user_id=user_id)\
+        .order_by(FavoriteRecipe.created_at.desc()).all()
+    
+    print(f"[FAVORITES] User {user_id} has {len(favorites)} favorites")
+    return render_template('favorites.html', favorites=favorites)
+
+
+@app.route('/remove_favorite/<int:id>')
+@login_required
+def remove_favorite(id):
+    """お気に入りから削除"""
+    user_id = session.get('user_id')
+    favorite = FavoriteRecipe.query.filter_by(id=id, user_id=user_id).first_or_404()
+    
+    title = favorite.title
+    try:
+        db.session.delete(favorite)
+        db.session.commit()
+        print(f"[FAVORITE] Removed: '{title}' by user {user_id}")
+        flash(f'「{title}」をお気に入りから削除しました')
+    except Exception as e:
+        db.session.rollback()
+        print(f"[ERROR] Remove favorite failed: {e}")
+        flash('お気に入りの削除中にエラーが発生しました')
+    
+    return redirect(url_for('favorites'))
+
+
+@app.route('/toggle_favorite', methods=['POST'])
+@login_required
+def toggle_favorite():
+    """お気に入りのトグル（追加/削除を切り替え）- AJAX用"""
+    user_id = session.get('user_id')
+    url = request.form.get('url', '').strip()
+    
+    if not url:
+        return {'status': 'error', 'message': 'URLが指定されていません'}, 400
+    
+    # 既存のお気に入りをチェック
+    favorite = FavoriteRecipe.query.filter_by(user_id=user_id, url=url).first()
+    
+    try:
+        if favorite:
+            # 削除
+            db.session.delete(favorite)
+            db.session.commit()
+            return {'status': 'removed', 'message': 'お気に入りから削除しました'}, 200
+        else:
+            # 追加
+            title = request.form.get('title', '').strip()
+            img = request.form.get('img', '').strip()
+            source = request.form.get('source', '').strip()
+            
+            favorite = FavoriteRecipe(
+                user_id=user_id,
+                title=title,
+                url=url,
+                img=img,
+                source=source
+            )
+            db.session.add(favorite)
+            db.session.commit()
+            return {'status': 'added', 'message': 'お気に入りに追加しました'}, 200
+            
+    except Exception as e:
+        db.session.rollback()
+        print(f"[ERROR] Toggle favorite failed: {e}")
+        return {'status': 'error', 'message': 'エラーが発生しました'}, 500
+
+
+# ---------- 閲覧履歴機能 ----------
+
+@app.route('/record_view', methods=['POST'])
+@login_required
+def record_view():
+    """閲覧履歴に記録（レシピリンククリック時に自動実行）"""
+    user_id = session.get('user_id')
+    title = request.form.get('title', '').strip()
+    url = request.form.get('url', '').strip()
+    img = request.form.get('img', '').strip()
+    source = request.form.get('source', '').strip()
+    
+    if not title or not url or not source:
+        return '', 400
+    
+    try:
+        # 同じURLの履歴が既に存在する場合は更新（最新の閲覧日時に）
+        existing = RecipeHistory.query.filter_by(user_id=user_id, url=url).first()
+        if existing:
+            existing.viewed_at = datetime.utcnow()
+            existing.title = title  # タイトルも更新
+            existing.img = img
+            existing.source = source
+        else:
+            # 新規追加
+            history = RecipeHistory(
+                user_id=user_id,
+                title=title,
+                url=url,
+                img=img,
+                source=source
+            )
+            db.session.add(history)
+        
+        db.session.commit()
+        
+        # 履歴が50件を超えたら古いものを削除
+        history_count = RecipeHistory.query.filter_by(user_id=user_id).count()
+        if history_count > 50:
+            old_records = RecipeHistory.query.filter_by(user_id=user_id)\
+                .order_by(RecipeHistory.viewed_at.asc())\
+                .limit(history_count - 50).all()
+            for record in old_records:
+                db.session.delete(record)
+            db.session.commit()
+            print(f"[HISTORY] Cleaned up old records for user {user_id}")
+        
+        print(f"[HISTORY] Recorded: '{title}' by user {user_id}")
+        return '', 204  # No Content (成功)
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"[ERROR] Record view failed: {e}")
+        return '', 500
+
+
+@app.route('/history')
+@login_required
+def history():
+    """閲覧履歴一覧"""
+    user_id = session.get('user_id')
+    history = RecipeHistory.query.filter_by(user_id=user_id)\
+        .order_by(RecipeHistory.viewed_at.desc()).all()
+    
+    print(f"[HISTORY] User {user_id} has {len(history)} history records")
+    return render_template('history.html', history=history)
+
+
+@app.route('/clear_history')
+@login_required
+def clear_history():
+    """閲覧履歴を全てクリア"""
+    user_id = session.get('user_id')
+    
+    try:
+        deleted_count = RecipeHistory.query.filter_by(user_id=user_id).delete()
+        db.session.commit()
+        print(f"[HISTORY] Cleared {deleted_count} records for user {user_id}")
+        flash(f'{deleted_count}件の閲覧履歴をクリアしました')
+    except Exception as e:
+        db.session.rollback()
+        print(f"[ERROR] Clear history failed: {e}")
+        flash('閲覧履歴のクリア中にエラーが発生しました')
+    
+    return redirect(url_for('history'))
+
+
+@app.route('/remove_history/<int:id>')
+@login_required
+def remove_history(id):
+    """閲覧履歴から個別に削除"""
+    user_id = session.get('user_id')
+    history_item = RecipeHistory.query.filter_by(id=id, user_id=user_id).first_or_404()
+    
+    title = history_item.title
+    try:
+        db.session.delete(history_item)
+        db.session.commit()
+        print(f"[HISTORY] Removed: '{title}' by user {user_id}")
+        flash(f'「{title}」を閲覧履歴から削除しました')
+    except Exception as e:
+        db.session.rollback()
+        print(f"[ERROR] Remove history failed: {e}")
+        flash('閲覧履歴の削除中にエラーが発生しました')
+    
+    return redirect(url_for('history'))
+
+
+# 【3】ヘルパー関数（検索結果でお気に入り状態を確認するため）
+
+def get_favorite_urls(user_id):
+    """ユーザーのお気に入りレシピのURLリストを取得"""
+    favorites = FavoriteRecipe.query.filter_by(user_id=user_id).all()
+    return [fav.url for fav in favorites]
+
+
 
 @app.route('/add', methods=['GET', 'POST'])
 @login_required
@@ -795,6 +1062,14 @@ def migrate_database():
     except Exception as e:
         print(f"[MIGRATION ERROR] {e}")
 
+    def migrate_recipe_features():
+        """お気に入り・履歴テーブルを作成"""
+        try:
+        # テーブルを作成（存在しない場合のみ）
+            db.create_all()
+            print("[MIGRATION] Recipe features tables checked/created")
+        except Exception as e:
+            print(f"[MIGRATION ERROR] {e}")
 
 # データベース初期化時に実行
 with app.app_context():

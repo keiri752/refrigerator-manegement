@@ -24,6 +24,7 @@
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     
+    <!-- 基本スタイル（全ページ共通） -->
     <style>
         body {
             font-size: 14px;
@@ -93,6 +94,19 @@
         .nav-icon {
             font-size: 1.2rem;
             margin-bottom: 2px;
+        }
+
+
+        /* 6項目ナビゲーション対応 */
+        @media (max-width: 576px) {
+        .nav-link {
+            font-size: 0.6rem;
+            padding: 6px 2px;
+        }
+    
+        .nav-icon {
+            font-size: 1rem;
+        }
         }
         
         /* カード風のセクション */
@@ -179,12 +193,12 @@
             }
             
             .nav-link {
-                font-size: 0.65rem;
+                font-size: 0.6rem;
                 padding: 6px 2px;
             }
             
             .nav-icon {
-                font-size: 1.1rem;
+                font-size: 1rem;
             }
         }
         
@@ -193,9 +207,10 @@
             min-height: calc(100vh - 140px);
             padding-top: 20px;
         }
-    </style>    
-        {% block extra_css %}{% endblock %}
+    </style>
     
+    <!-- ページ固有のスタイル -->
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
     <div class="container">
@@ -230,39 +245,50 @@
         </div>
     </div>
 
-    <!-- 下部ナビゲーション -->
-    <nav class="bottom-nav">
-        <div class="d-flex">
-            <div class="nav-item">
-                <a href="{{ url_for('dashboard') }}" class="nav-link {{ 'active' if request.endpoint == 'dashboard' }}">
-                    <div class="nav-icon">🏠</div>
-                    <div>ホーム</div>
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="{{ url_for('refrigerator') }}" class="nav-link {{ 'active' if request.endpoint == 'refrigerator' }}">
-                    <div class="nav-icon">❄️</div>
-                    <div>冷蔵庫</div>
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="{{ url_for('search') }}" class="nav-link {{ 'active' if request.endpoint == 'search' }}">
-                    <div class="nav-icon">🔍</div>
-                    <div>レシピ</div>
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="{{ url_for('add_ingredient') }}" class="nav-link {{ 'active' if request.endpoint == 'add_ingredient' }}">
-                    <div class="nav-icon">➕</div>
-                    <div>追加</div>
-                </a>
-            </div>
+   <!-- 下部ナビゲーション -->
+<nav class="bottom-nav">
+    <div class="d-flex">
+        <div class="nav-item">
+            <a href="{{ url_for('dashboard') }}" class="nav-link {{ 'active' if request.endpoint == 'dashboard' }}">
+                <div class="nav-icon">🏠</div>
+                <div>ホーム</div>
+            </a>
         </div>
-    </nav>
+        <div class="nav-item">
+            <a href="{{ url_for('refrigerator') }}" class="nav-link {{ 'active' if request.endpoint == 'refrigerator' }}">
+                <div class="nav-icon">❄️</div>
+                <div>冷蔵庫</div>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{{ url_for('search') }}" class="nav-link {{ 'active' if request.endpoint == 'search' }}">
+                <div class="nav-icon">🔍</div>
+                <div>検索</div>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{{ url_for('add_ingredient') }}" class="nav-link {{ 'active' if request.endpoint == 'add_ingredient' }}">
+                <div class="nav-icon">➕</div>
+                <div>追加</div>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{{ url_for('favorites') }}" class="nav-link {{ 'active' if request.endpoint == 'favorites' }}">
+                <div class="nav-icon">💖</div>
+                <div>保存</div>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{{ url_for('history') }}" class="nav-link {{ 'active' if request.endpoint == 'history' }}">
+                <div class="nav-icon">📜</div>
+                <div>履歴</div>
+            </a>
+        </div>
+    </div>
+</nav>
 
     <!-- ここからJavaScript -->
-    {% block extra_js %}
-        <script>
+    <script>
         // PWA Service Worker登録
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/sw.js')
@@ -284,9 +310,9 @@
                 }, 3000);
             }
         });
-        
-    {% endblock %}
     </script>
+    
+    {% block extra_js %}{% endblock %}
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

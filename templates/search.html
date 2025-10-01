@@ -205,9 +205,22 @@
                             <h6 class="card-title">{{ r.title }}</h6>
                             <div class="d-flex justify-content-between align-items-center mt-2">
                                 <span class="badge bg-info">{{ r.source }}</span>
-                                <a href="{{ r.url }}" class="btn btn-primary btn-sm" target="_blank" rel="noopener">
-                                    開く
-                                </a>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{{ r.url }}" 
+                                            class="btn btn-primary btn-sm" 
+                                            target="_blank" 
+                                            rel="noopener"
+                                            onclick="recordView(this.dataset.recipe)" 
+                                            data-recipe='{{ {"title": r.title, "url": r.url, "img": r.img, "source": r.source}|tojson }}'>
+                                            開く
+                                        </a>
+                                        <button type="button" 
+                                            class="btn btn-outline-danger btn-sm"
+                                            onclick="toggleFavorite(this)"
+                                            data-recipe='{{ {"title": r.title, "url": r.url, "img": r.img, "source": r.source}|tojson }}'>
+                                            ❤️
+                                        </button>
+                                    </div>
                             </div>
                         </div>
                     </div>
@@ -476,5 +489,43 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// お気に入りのトグル
+function toggleFavorite(button) {
+    const recipe = JSON.parse(button.dataset.recipe);
+    const formData = new FormData();
+    formData.append('title', recipe.title);
+    formData.append('url', recipe.url);
+    formData.append('img', recipe.img || '');
+    formData.append('source', recipe.source);
+    
+    fetch('{{ url_for("add_favorite") }}', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.ok)
+    .then(success => {
+        if (success) {
+            button.textContent = button.textContent === '❤️' ? '🤍' : '❤️';
+            console.log('Favorite toggled:', recipe.title);
+        }
+    })
+    .catch(error => console.error('Favorite error:', error));
+}
+
+// 閲覧履歴を記録
+function recordView(recipeData) {
+    const recipe = JSON.parse(recipeData);
+    const formData = new FormData();
+    formData.append('title', recipe.title);
+    formData.append('url', recipe.url);
+    formData.append('img', recipe.img || '');
+    formData.append('source', recipe.source);
+    
+    fetch('{{ url_for("record_view") }}', {
+        method: 'POST',
+        body: formData
+    }).catch(error => console.error('Record view error:', error));
+}
 </script>
 {% endblock %}
