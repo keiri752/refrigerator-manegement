@@ -1825,14 +1825,13 @@ body {
 
 
 /* register.htmlより */
-/*body設定は削除（base.htmlで管理するので）*/
 
 .register-container {
     min-height: 100vh;
     display: flex;
     align-items: center;
     padding: 20px;
-    background: linear-gradient(135deg, #28a745, #20c997);
+    background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
 }
 
 .register-card {
