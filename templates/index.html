@@ -27,283 +27,10 @@
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     
-    <style>
-        /* モバイル専用スタイル */
-        body {
-            padding-bottom: 20px;
-            font-size: 14px;
-        }
-        
-        .container {
-            padding: 15px;
-        }
-        
-        /* ヘッダー */
-        .app-header {
-            background: linear-gradient(135deg, #007bff, #0056b3);
-            color: white;
-            padding: 15px;
-            margin: -15px -15px 20px -15px;
-            border-radius: 0 0 15px 15px;
-            box-shadow: 0 2px 10px rgba(0,123,255,0.3);
-        }
-        
-        .app-header h1 {
-            font-size: 1.5rem;
-            margin: 0;
-        }
-        
-        .user-info {
-            font-size: 0.8rem;
-            opacity: 0.9;
-        }
-        
-        /* カード風のセクション */
-        .section-card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
-            border: 1px solid #e9ecef;
-        }
-        
-        .section-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #495057;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-        }
-        
-        .section-title::before {
-            content: '';
-            width: 4px;
-            height: 20px;
-            background: #007bff;
-            margin-right: 10px;
-            border-radius: 2px;
-        }
-        
-        /* 食材チェックボックス */
-        .ingredient-list {
-            max-height: 200px;
-            overflow-y: auto;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            padding: 10px;
-            background: #f8f9fa;
-        }
-        
-        .form-check {
-            padding: 8px;
-            border-radius: 6px;
-            margin-bottom: 5px;
-        }
-        
-        .form-check:hover {
-            background: rgba(0,123,255,0.1);
-        }
-        
-        /* 食材管理のボタングループ */
-        .ingredient-controls {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: #f8f9fa;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 8px;
-        }
-        
-        .ingredient-name {
-            font-weight: 600;
-            color: #495057;
-            flex: 1;
-            min-width: 0;
-        }
-        
-        .quantity-controls {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .btn-quantity {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        /* 検索ボタンとフォーム */
-        .search-form input[type="text"] {
-            border-radius: 25px;
-            padding: 12px 20px;
-            border: 2px solid #e9ecef;
-            font-size: 14px;
-        }
-        
-        .search-form input[type="text"]:focus {
-            border-color: #007bff;
-            box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
-        }
-        
-        .btn-search {
-            border-radius: 25px;
-            padding: 12px 25px;
-            font-weight: 600;
-            box-shadow: 0 2px 10px rgba(0,123,255,0.3);
-        }
-        
-        /* 食材追加フォーム */
-        .add-ingredient-form {
-            background: linear-gradient(135deg, #28a745, #20c997);
-            color: white;
-            border-radius: 12px;
-            padding: 20px;
-        }
-        
-        .add-ingredient-form input {
-            border: none;
-            border-radius: 8px;
-            padding: 12px;
-        }
-        
-        .add-ingredient-form .btn {
-            border: none;
-            background: rgba(255,255,255,0.2);
-            color: white;
-            font-weight: 600;
-        }
-        
-        /* レシピの表示制御（JavaScript制御） */
-        .recipe-item {
-            display: none;
-        }
-        
-        .show-more-container {
-            text-align: center;
-            margin-top: 20px;
-        }
-        
-        .btn-show-more {
-            background: linear-gradient(135deg, #007bff, #0056b3);
-            border: none;
-            color: white;
-            padding: 12px 30px;
-            border-radius: 25px;
-            font-weight: 600;
-            box-shadow: 0 4px 15px rgba(0,123,255,0.3);
-            transition: transform 0.2s;
-        }
-        
-        .btn-show-more:hover {
-            transform: translateY(-1px);
-            background: linear-gradient(135deg, #0056b3, #004085);
-        }
-        
-        .results-info {
-            text-align: center;
-            margin-bottom: 15px;
-            color: #6c757d;
-            font-size: 0.9rem;
-        }
-        
-        /* レシピカード */
-        .recipe-card {
-            border: none;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
-        }
-        
-        .recipe-card:hover {
-            transform: translateY(-2px);
-        }
-        
-        .recipe-card img {
-            height: 150px;
-            object-fit: cover;
-        }
-        
-        .recipe-card .card-title {
-            font-size: 0.9rem;
-            line-height: 1.3;
-        }
-        
-        /* フラッシュメッセージ */
-        .alert {
-            border: none;
-            border-radius: 10px;
-        }
-        
-        /* 空の状態 */
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #6c757d;
-        }
-        
-        .empty-state-icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            opacity: 0.5;
-        }
-        
-        /* タッチ操作の改善 */
-        .btn {
-            min-height: 44px;
-            border-radius: 8px;
-        }
-        
-        .form-control, .form-select {
-            min-height: 44px;
-            border-radius: 8px;
-        }
-        
-        /* 色分け（賞味期限） */
-        .text-danger { color: #dc3545 !important; }
-        .text-warning { color: #fd7e14 !important; }
-        .text-success { color: #198754 !important; }
-        
-        /* レスポンシブ調整 */
-        @media (max-width: 576px) {
-            .container {
-                padding: 10px;
-            }
-            
-            .section-card {
-                padding: 15px;
-            }
-            
-            .col-6 {
-                padding-left: 5px;
-                padding-right: 5px;
-            }
-        }
-        
-        /* インストール案内 */
-        .install-notice {
-            background: linear-gradient(135deg, #17a2b8, #138496);
-            color: white;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            text-align: center;
-            font-size: 0.9rem;
-        }
-        
-        .install-notice strong {
-            display: block;
-            margin-bottom: 5px;
-        }
-    </style>
+    <!-- ▼▼▼▼▼追加▼▼▼▼▼ -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <!-- ▲▲▲▲▲追加▲▲▲▲▲ -->
+
 </head>
 <body>
     <div class="container">
@@ -320,7 +47,7 @@
                     <h1>🍳 レシピ検索</h1>
                     <div class="user-info">ようこそ、{{ session.username }}さん</div>
                 </div>
-                <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm">
+                <a href="{{ url_for('loginout_app.logout') }}" class="btn btn-outline-light btn-sm">
                     ログアウト
                 </a>
             </div>
@@ -396,14 +123,14 @@
                     <div class="ingredient-controls">
                         <span class="ingredient-name">{{ ing.name }}</span>
                         <div class="quantity-controls">
-                            <form action="{{ url_for('change_quantity', id=ing.id, action='minus') }}" method="post" style="display:inline;">
+                            <form action="{{ url_for('recipe_app.change_quantity', id=ing.id, action='minus') }}" method="post" style="display:inline;">
                                 <button type="submit" class="btn btn-outline-secondary btn-sm btn-quantity">−</button>
                             </form>
                             <span class="mx-2 fw-bold">{{ ing.quantity }}</span>
-                            <form action="{{ url_for('change_quantity', id=ing.id, action='plus') }}" method="post" style="display:inline;">
+                            <form action="{{ url_for('recipe_app.change_quantity', id=ing.id, action='plus') }}" method="post" style="display:inline;">
                                 <button type="submit" class="btn btn-outline-secondary btn-sm btn-quantity">＋</button>
                             </form>
-                            <a href="{{ url_for('delete_ingredient', id=ing.id) }}" 
+                            <a href="{{ url_for('recipe_app.delete_ingredient', id=ing.id) }}" 
                                class="btn btn-outline-danger btn-sm ms-2"
                                onclick="return confirm('{{ ing.name }}を削除しますか？')">🗑</a>
                         </div>
@@ -424,7 +151,7 @@
         <!-- 食材追加セクション -->
         <div class="add-ingredient-form">
             <div class="section-title text-white">➕ 食材を登録</div>
-            <form action="{{ url_for('add_ingredient') }}" method="post">
+            <form action="{{ url_for('recipe_app.add_ingredient') }}" method="post">
                 <div class="row g-2">
                     <div class="col-12 col-sm-6">
                         <input type="text" name="ingredient" class="form-control" 

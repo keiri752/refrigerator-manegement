@@ -3,332 +3,6 @@
 {% block title %}冷蔵庫 - レシピ検索アプリ{% endblock %}
 {% block page_title %}冷蔵庫{% endblock %}
 
-{% block extra_css %}
-<style>
-    .ingredient-controls {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        background: #f8f9fa;
-        padding: 12px;
-        border-radius: 8px;
-        margin-bottom: 8px;
-        transition: background-color 0.2s;
-    }
-
-    .ingredient-controls.selected {
-        background: #e3f2fd;
-        border: 2px solid #2196f3;
-    }
-    
-    .ingredient-checkbox {
-        width: 20px;
-        height: 20px;
-        cursor: pointer;
-    }
-    
-    .ingredient-name {
-        font-weight: 600;
-        color: #495057;
-        flex: 1;
-        min-width: 0;
-    }
-    
-    .ingredient-info {
-        font-size: 0.8rem;
-        color: #6c757d;
-        margin-top: 2px;
-    }
-    
-    .quantity-controls {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-    }
-    
-    .btn-quantity {
-        width: 35px;
-        height: 35px;
-        border-radius: 50%;
-        padding: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    .sort-buttons {
-        display: flex;
-        gap: 5px;
-        flex-wrap: wrap;
-        margin-bottom: 15px;
-    }
-    
-    .sort-buttons .btn {
-        font-size: 0.8rem;
-        padding: 5px 12px;
-        min-height: auto;
-    }
-    
-    .empty-state {
-        text-align: center;
-        padding: 40px 20px;
-        color: #6c757d;
-    }
-    
-    .empty-state-icon {
-        font-size: 3rem;
-        margin-bottom: 15px;
-        opacity: 0.5;
-    }
-
-    /* 一括操作バー */
-    .bulk-actions-bar {
-        position: sticky;
-        top: 0;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 15px;
-        border-radius: 12px;
-        margin-bottom: 20px;
-        display: none;
-        z-index: 100;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    }
-
-    .bulk-actions-bar.active {
-        display: block;
-        animation: slideDown 0.3s ease-out;
-    }
-
-    @keyframes slideDown {
-        from {
-            opacity: 0;
-            transform: translateY(-20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .bulk-actions-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 15px;
-    }
-
-    .selected-count {
-        font-size: 1.1rem;
-        font-weight: 600;
-    }
-
-    .bulk-action-buttons {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-    }
-
-    .bulk-action-buttons .btn {
-        font-size: 0.85rem;
-        padding: 8px 15px;
-        border: none;
-        background: rgba(255,255,255,0.2);
-        color: white;
-        backdrop-filter: blur(10px);
-    }
-
-    .bulk-action-buttons .btn:hover {
-        background: rgba(255,255,255,0.3);
-    }
-
-    .bulk-action-buttons .btn-danger {
-        background: rgba(244,67,54,0.8);
-    }
-
-    .bulk-action-buttons .btn-danger:hover {
-        background: rgba(244,67,54,1);
-    }
-
-    /* モーダルスタイル */
-    .bulk-modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.5);
-        z-index: 1000;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .bulk-modal.active {
-        display: flex;
-    }
-
-    .bulk-modal-content {
-        background: white;
-        border-radius: 12px;
-        padding: 25px;
-        max-width: 500px;
-        width: 90%;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-    }
-
-    .bulk-modal-header {
-        font-size: 1.3rem;
-        font-weight: 600;
-        margin-bottom: 20px;
-        color: #333;
-    }
-
-    .bulk-modal-body {
-        margin-bottom: 20px;
-    }
-
-    .bulk-modal-footer {
-        display: flex;
-        gap: 10px;
-        justify-content: flex-end;
-    }
-
-    /* タブスタイル */
-    .category-tabs {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 5px;
-        margin-bottom: 20px;
-        border-bottom: 2px solid #e9ecef;
-        padding-bottom: 10px;
-    }
-
-    .category-tab {
-        background: #f8f9fa;
-        border: 1px solid #dee2e6;
-        color: #495057;
-        padding: 8px 16px;
-        text-decoration: none;
-        border-radius: 20px 20px 0 0;
-        font-size: 0.9rem;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        position: relative;
-    }
-
-    .category-tab:hover {
-        background: #e9ecef;
-        color: #495057;
-        text-decoration: none;
-    }
-
-    .category-tab.active {
-        background: #007bff;
-        color: white;
-        border-color: #007bff;
-        box-shadow: 0 2px 4px rgba(0,123,255,0.3);
-    }
-
-    .category-tab .badge {
-        background: rgba(255,255,255,0.3);
-        color: white;
-        font-size: 0.7rem;
-        margin-left: 5px;
-        padding: 2px 6px;
-        border-radius: 10px;
-    }
-
-    .category-tab:not(.active) .badge {
-        background: #6c757d;
-        color: white;
-    }
-
-    .tab-content {
-        min-height: 200px;
-    }
-
-    .category-section {
-        display: none;
-    }
-
-    .category-section.active {
-        display: block;
-        animation: fadeIn 0.3s ease-in-out;
-    }
-
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    .category-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 15px;
-        padding: 10px 15px;
-        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-        border-radius: 8px;
-    }
-
-    .category-title {
-        font-size: 1.2rem;
-        font-weight: 600;
-        color: #495057;
-        margin: 0;
-    }
-
-    .category-stats {
-        font-size: 0.8rem;
-        color: #6c757d;
-    }
-
-    .select-all-btn {
-        font-size: 0.8rem;
-        padding: 4px 10px;
-        margin-left: 10px;
-    }
-
-    /* レスポンシブ対応 */
-    @media (max-width: 768px) {
-        .category-tabs {
-            justify-content: center;
-        }
-        
-        .category-tab {
-            font-size: 0.8rem;
-            padding: 6px 12px;
-        }
-
-        .bulk-action-buttons {
-            justify-content: center;
-        }
-
-        .bulk-action-buttons .btn {
-            flex: 1;
-            min-width: 100px;
-        }
-    }
-
-    /* 全て表示タブのスタイル */
-    .category-tab.all-tab {
-        background: #28a745;
-        color: white;
-        border-color: #28a745;
-    }
-
-    .category-tab.all-tab:hover {
-        background: #218838;
-        color: white;
-    }
-
-    .category-tab.all-tab.active {
-        background: #1e7e34;
-        box-shadow: 0 2px 4px rgba(40,167,69,0.3);
-    }
-</style>
-{% endblock %}
 
 {% block content %}
 {% if ingredients %}
@@ -362,19 +36,19 @@
             </button>
         </div>
         <div class="sort-buttons">
-            <a href="{{ url_for('refrigerator') }}" 
+            <a href="{{ url_for('recipe_app.refrigerator') }}" 
                class="btn {{ 'btn-primary' if not sort else 'btn-outline-secondary' }} btn-sm">
                 登録順
             </a>
-            <a href="{{ url_for('refrigerator', sort='expiry') }}" 
+            <a href="{{ url_for('recipe_app.refrigerator', sort='expiry') }}" 
                class="btn {{ 'btn-primary' if sort == 'expiry' else 'btn-outline-secondary' }} btn-sm">
                 賞味期限順
             </a>
-            <a href="{{ url_for('refrigerator', sort='name') }}" 
+            <a href="{{ url_for('recipe_app.refrigerator', sort='name') }}" 
                class="btn {{ 'btn-primary' if sort == 'name' else 'btn-outline-secondary' }} btn-sm">
                 名前順
             </a>
-            <a href="{{ url_for('refrigerator', sort='quantity') }}" 
+            <a href="{{ url_for('recipe_app.refrigerator', sort='quantity') }}" 
                class="btn {{ 'btn-primary' if sort == 'quantity' else 'btn-outline-secondary' }} btn-sm">
                 数量順
             </a>
@@ -500,10 +174,10 @@
     <div class="section-card">
         <div class="section-title">🚀 アクション</div>
         <div class="d-grid gap-2 d-md-flex">
-            <a href="{{ url_for('add_ingredient') }}" class="btn btn-success">
+            <a href="{{ url_for('recipe_app.add_ingredient') }}" class="btn btn-success">
                 食材を追加
             </a>
-            <a href="{{ url_for('search') }}" class="btn btn-primary">
+            <a href="{{ url_for('recipe_app.search') }}" class="btn btn-primary">
                 レシピを検索
             </a>
         </div>
@@ -515,7 +189,7 @@
         <div class="empty-state-icon">❄️</div>
         <h5>冷蔵庫が空っぽです</h5>
         <p>まずは食材を登録して、<br>冷蔵庫管理を始めましょう。</p>
-        <a href="{{ url_for('add_ingredient') }}" class="btn btn-primary">
+        <a href="{{ url_for('recipe_app.add_ingredient') }}" class="btn btn-primary">
             最初の食材を登録
         </a>
     </div>
@@ -526,7 +200,7 @@
     <div class="bulk-modal-content">
         <div class="bulk-modal-header">カテゴリを一括変更</div>
         <div class="bulk-modal-body">
-            <form id="bulkCategoryForm" method="POST" action="{{ url_for('bulk_change_category') }}">
+            <form id="bulkCategoryForm" method="POST" action="{{ url_for('recipe_app.bulk_change_category') }}">
                 <label class="form-label">変更先のカテゴリ</label>
                 <select name="new_category" class="form-select" required>
                     {% for cat in all_categories %}
@@ -548,7 +222,7 @@
     <div class="bulk-modal-content">
         <div class="bulk-modal-header">数量を一括変更</div>
         <div class="bulk-modal-body">
-            <form id="bulkQuantityForm" method="POST" action="{{ url_for('bulk_change_quantity') }}">
+            <form id="bulkQuantityForm" method="POST" action="{{ url_for('recipe_app.bulk_change_quantity') }}">
                 <label class="form-label">操作</label>
                 <select name="action" class="form-select mb-3">
                     <option value="set">指定の数量に設定</option>
@@ -651,7 +325,7 @@
         
         const form = document.createElement('form');
         form.method = 'POST';
-        form.action = '{{ url_for("bulk_delete") }}';
+        form.action = '{{ url_for("recipe_app.bulk_delete") }}';
         
         selectedIngredients.forEach(id => {
             const input = document.createElement('input');

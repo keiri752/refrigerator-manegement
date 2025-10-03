@@ -1,6 +1,6 @@
-const CACHE_NAME = 'recipe-app-multipage-v2'; // バージョンアップ
-const STATIC_CACHE = 'static-multipage-v2';
-const DYNAMIC_CACHE = 'dynamic-multipage-v2';
+const CACHE_NAME = 'recipe-app-multipage-v3'; // バージョンアップ
+const STATIC_CACHE = 'static-multipage-v3';
+const DYNAMIC_CACHE = 'dynamic-multipage-v3';
 
 // 静的リソースのみキャッシュ（ユーザーデータを含むページは除外）
 const urlsToCache = [

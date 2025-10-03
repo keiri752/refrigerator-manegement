@@ -1,0 +1,2082 @@
+
+/* base.htmlより */
+body {
+    font-size: 14px;
+    background-color: #f8f9fa;
+    padding-bottom: 80px; /* ナビゲーション分のスペース */
+}
+
+.container {
+    padding: 15px;
+    max-width: 100%;
+}
+
+/* ヘッダー */
+.app-header {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    padding: 15px;
+    margin: -15px -15px 0 -15px;
+    border-radius: 0 0 15px 15px;
+    box-shadow: 0 2px 10px rgba(0,123,255,0.3);
+}
+
+.app-header h1 {
+    font-size: 1.3rem;
+    margin: 0;
+}
+
+.user-info {
+    font-size: 0.8rem;
+    opacity: 0.9;
+}
+
+/* ナビゲーション（下部固定） */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-top: 1px solid #dee2e6;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+}
+
+.nav-item {
+    flex: 1;
+    text-align: center;
+}
+
+.nav-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 4px;
+    color: #6c757d;
+    text-decoration: none;
+    font-size: 0.7rem;
+    min-height: 60px;
+    justify-content: center;
+}
+
+.nav-link.active {
+    color: #007bff;
+    background-color: rgba(0,123,255,0.1);
+}
+
+.nav-icon {
+    font-size: 1.2rem;
+    margin-bottom: 2px;
+}
+
+
+/* 6項目ナビゲーション対応 */
+@media (max-width: 576px) {
+.nav-link {
+    font-size: 0.6rem;
+    padding: 6px 2px;
+}
+
+.nav-icon {
+    font-size: 1rem;
+}
+}
+
+/* カード風のセクション */
+.section-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+    border: 1px solid #e9ecef;
+}
+
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.section-title::before {
+    content: '';
+    width: 4px;
+    height: 20px;
+    background: #007bff;
+    margin-right: 10px;
+    border-radius: 2px;
+}
+
+/* 通知カード */
+.notification-card {
+    border-left: 4px solid;
+    margin-bottom: 10px;
+}
+
+.notification-card.danger {
+    border-left-color: #dc3545;
+    background-color: #f8d7da;
+}
+
+.notification-card.warning {
+    border-left-color: #ffc107;
+    background-color: #fff3cd;
+}
+
+.notification-card.info {
+    border-left-color: #17a2b8;
+    background-color: #d1ecf1;
+}
+
+/* フラッシュメッセージ */
+.alert {
+    border: none;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+/* ボタン */
+.btn {
+    min-height: 44px;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.form-control, .form-select {
+    min-height: 44px;
+    border-radius: 8px;
+}
+
+/* 色分け（賞味期限） */
+.text-danger { color: #dc3545 !important; }
+.text-warning { color: #fd7e14 !important; }
+.text-success { color: #198754 !important; }
+
+/* レスポンシブ調整 */
+@media (max-width: 576px) {
+    .container {
+        padding: 10px;
+    }
+    
+    .section-card {
+        padding: 15px;
+    }
+    
+    .nav-link {
+        font-size: 0.6rem;
+        padding: 6px 2px;
+    }
+    
+    .nav-icon {
+        font-size: 1rem;
+    }
+}
+
+/* コンテンツエリア */
+.content-area {
+    min-height: calc(100vh - 140px);
+    padding-top: 20px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   
+/* add_ingredienthtmlより */
+.add-form-card .form-label {
+    color: rgb(0, 0, 0);
+}
+
+.add-form-card input,
+.add-form-card select,
+.add-form-card .form-control {
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 14px;
+}
+
+.add-form-card .btn {
+    border: none;
+    background: rgba(255,255,255,0.2);
+    color: white;
+    font-weight: 600;
+    padding: 12px 20px;
+}
+
+.add-form-card .btn:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+.add-form-card label {
+    color: white;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.quick-add-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.quick-add-btn {
+    background: white;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    text-decoration: none;
+    color: #495057;
+    font-size: 0.8rem;
+    transition: all 0.3s;
+}
+
+.quick-add-btn:hover {
+    border-color: #007bff;
+    color: #007bff;
+    background: rgba(0,123,255,0.1);
+}
+
+.tips-card {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.tip-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.tip-icon {
+    font-size: 1.2rem;
+    margin-right: 10px;
+    margin-top: 2px;
+}
+
+.recent-ingredients {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.selected-tags-container {
+    min-height: 40px;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.selected-tag {
+    background: #007bff;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.tag-remove {
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.tag-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 8px;
+}
+
+.tag-btn {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 12px;
+    padding: 4px 8px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tag-btn:hover {
+    background: #007bff;
+    color: white;
+}
+
+.recent-item {
+    background: #f8f9fa;
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.recent-item:hover {
+    background: #e9ecef;
+}
+
+/* メインの登録ボタンに立体感を追加 */
+.add-form-card .btn-light {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 
+                0 1px 3px rgba(0, 0, 0, 0.08);
+    transform: translateY(0);
+    transition: all 0.2s ease;
+    background: linear-gradient(to bottom, #ffffff, #f8f9fa);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.add-form-card .btn-light:hover {
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15), 
+                0 2px 4px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+    background: linear-gradient(to bottom, #ffffff, #ffffff);
+}
+
+.add-form-card .btn-light:active {
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1) inset;
+    transform: translateY(1px);
+}
+
+/* 数量調整ボタンに立体感を追加 */
+.add-form-card .btn-outline-light {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transform: translateY(0);
+    transition: all 0.15s ease;
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    color: black;
+}
+
+.add-form-card .btn-outline-light:hover {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+    background: rgba(255, 255, 255, 1);
+    color: black;
+}
+
+.add-form-card .btn-outline-light:active {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
+    transform: translateY(1px);
+}
+
+/* クイック設定ボタンに立体感を追加（base.htmlのログアウトボタンと同じスタイル） */
+.btn-sm.btn-outline-light {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    transform: translateY(0);
+    transition: all 0.2s ease;
+    background: white;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    color: black;
+    font-weight: 500;
+}
+
+.btn-sm.btn-outline-light:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.8);
+    color: white;
+}
+
+.btn-sm.btn-outline-light:active {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
+    transform: translateY(0);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* よく使う食材ボタンにも立体感を追加 */
+.quick-add-btn {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    transform: translateY(0);
+    transition: all 0.2s ease;
+}
+
+.quick-add-btn:hover {
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.quick-add-btn:active {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
+    transform: translateY(0);
+}
+
+/* アクションボタンにも立体感を追加 */
+.section-card .btn {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transform: translateY(0);
+    transition: all 0.2s ease;
+}
+
+.section-card .btn:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+.section-card .btn:active {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
+    transform: translateY(1px);
+}
+
+/* ボタン押下時のアニメーション強化 */
+.btn-light span {
+    display: inline-block;
+    transition: transform 0.1s ease;
+}
+
+.btn-light:active span {
+    transform: scale(0.98);
+}
+
+.add-form-card {
+    background: linear-gradient(135deg, #28a745, #20c997) !important;
+    color: white;
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 20px;
+}
+
+.add-form-card {
+    background: linear-gradient(135deg, #28a745, #20c997) !important;
+    color: white;
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 20px;
+}
+/* 未設定メッセージとクイック設定のテキストの色とサイズ */
+.add-form-card small,
+.add-form-card .text-white-50 {
+    color: rgb(255, 255, 255) !important;
+    font-size: 0.9rem !important;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* dashboard.htmlより */
+.stats-card {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.stats-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.stats-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.quick-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.action-btn {
+    background: white;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 20px;
+    text-decoration: none;
+    color: #495057;
+    transition: all 0.3s;
+    text-align: center;
+}
+
+.action-btn:hover {
+    border-color: #007bff;
+    color: #007bff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,123,255,0.2);
+}
+
+.action-icon {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    display: block;
+}
+
+/* おすすめレシピ用スタイル */
+.recipe-recommendations {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+    color: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.recipe-card {
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease;
+}
+
+.recipe-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+.recipe-card:last-child {
+    margin-bottom: 0;
+}
+
+.recipe-image {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 6px;
+    float: left;
+    margin-right: 15px;
+}
+
+.recipe-content {
+    overflow: hidden;
+}
+
+.recipe-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.recipe-meta {
+    font-size: 0.8rem;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.recipe-ingredient-tag {
+    background: #e3f2fd;
+    color: #1976d2;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 500;
+}
+
+.recipe-actions {
+    margin-top: 10px;
+    display: flex;
+    gap: 8px;
+}
+
+.btn-recipe {
+    font-size: 0.8rem;
+    padding: 4px 12px;
+    border-radius: 15px;
+}
+
+.no-image-placeholder {
+    width: 80px;
+    height: 80px;
+    background: #f8f9fa;
+    border: 2px dashed #dee2e6;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: #adb5bd;
+    float: left;
+    margin-right: 15px;
+}
+
+@media (max-width: 768px) {
+    .recipe-image, .no-image-placeholder {
+        width: 60px;
+        height: 60px;
+        margin-right: 10px;
+    }
+    
+    .recipe-title {
+        font-size: 0.9rem;
+    }
+    
+    .quick-actions {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* favorites.htmlより */
+.recipe-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.recipe-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.recipe-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+.recipe-image {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    background: #f8f9fa;
+}
+
+.recipe-content {
+    padding: 15px;
+}
+
+.recipe-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.recipe-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.recipe-source {
+    background: #e3f2fd;
+    color: #1976d2;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.recipe-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.no-image-placeholder {
+    width: 100%;
+    height: 180px;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: #adb5bd;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6c757d;
+}
+
+.empty-state-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.stats-card {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+    color: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.stats-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+@media (max-width: 768px) {
+    .recipe-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 12px;
+    }
+
+    .recipe-image,
+    .no-image-placeholder {
+        height: 140px;
+    }
+
+    .recipe-content {
+        padding: 12px;
+    }
+
+    .recipe-title {
+        font-size: 0.9rem;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* history.htmlより */
+.recipe-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+gap: 20px;
+margin-top: 20px;
+}
+
+.recipe-card {
+background: white;
+border-radius: 12px;
+overflow: hidden;
+box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+transition: transform 0.2s, box-shadow 0.2s;
+position: relative;
+}
+
+.recipe-card:hover {
+transform: translateY(-4px);
+box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+.recipe-image {
+width: 100%;
+height: 180px;
+object-fit: cover;
+background: #f8f9fa;
+}
+
+.recipe-content {
+padding: 15px;
+}
+
+.recipe-title {
+font-size: 1rem;
+font-weight: 600;
+color: #333;
+margin-bottom: 10px;
+line-height: 1.4;
+display: -webkit-box;
+-webkit-line-clamp: 2;
+-webkit-box-orient: vertical;
+overflow: hidden;
+}
+
+.recipe-meta {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 10px;
+font-size: 0.85rem;
+color: #6c757d;
+}
+
+.recipe-source {
+background: #e3f2fd;
+color: #1976d2;
+padding: 4px 8px;
+border-radius: 12px;
+font-size: 0.75rem;
+font-weight: 500;
+}
+
+.recipe-actions {
+display: flex;
+gap: 8px;
+}
+
+.no-image-placeholder {
+width: 100%;
+height: 180px;
+background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 3rem;
+color: #adb5bd;
+}
+
+.empty-state {
+text-align: center;
+padding: 60px 20px;
+color: #6c757d;
+}
+
+.empty-state-icon {
+font-size: 4rem;
+margin-bottom: 20px;
+opacity: 0.5;
+}
+
+.stats-card {
+background: linear-gradient(135deg, #17a2b8, #138496);
+color: white;
+border-radius: 12px;
+padding: 20px;
+margin-bottom: 20px;
+text-align: center;
+}
+
+.stats-number {
+font-size: 2.5rem;
+font-weight: bold;
+margin-bottom: 5px;
+}
+
+.viewed-badge {
+position: absolute;
+top: 10px;
+right: 10px;
+background: rgba(0,0,0,0.7);
+color: white;
+padding: 4px 8px;
+border-radius: 12px;
+font-size: 0.7rem;
+font-weight: 500;
+}
+
+@media (max-width: 768px) {
+.recipe-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+}
+
+.recipe-image,
+.no-image-placeholder {
+    height: 140px;
+}
+
+.recipe-content {
+    padding: 12px;
+}
+
+.recipe-title {
+    font-size: 0.9rem;
+}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* index.htmlより */
+/* モバイル専用スタイル */
+body {
+    padding-bottom: 20px;
+    font-size: 14px;
+}
+
+.container {
+    padding: 15px;
+}
+
+/* ヘッダー */
+.app-header {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    padding: 15px;
+    margin: -15px -15px 20px -15px;
+    border-radius: 0 0 15px 15px;
+    box-shadow: 0 2px 10px rgba(0,123,255,0.3);
+}
+
+.app-header h1 {
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+.user-info {
+    font-size: 0.8rem;
+    opacity: 0.9;
+}
+
+/* カード風のセクション */
+.section-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+    border: 1px solid #e9ecef;
+}
+
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.section-title::before {
+    content: '';
+    width: 4px;
+    height: 20px;
+    background: #007bff;
+    margin-right: 10px;
+    border-radius: 2px;
+}
+
+/* 食材チェックボックス */
+.ingredient-list {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 10px;
+    background: #f8f9fa;
+}
+
+.form-check {
+    padding: 8px;
+    border-radius: 6px;
+    margin-bottom: 5px;
+}
+
+.form-check:hover {
+    background: rgba(0,123,255,0.1);
+}
+
+/* 食材管理のボタングループ */
+.ingredient-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+}
+
+.ingredient-name {
+    font-weight: 600;
+    color: #495057;
+    flex: 1;
+    min-width: 0;
+}
+
+.quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn-quantity {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 検索ボタンとフォーム */
+.search-form input[type="text"] {
+    border-radius: 25px;
+    padding: 12px 20px;
+    border: 2px solid #e9ecef;
+    font-size: 14px;
+}
+
+.search-form input[type="text"]:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+}
+
+.btn-search {
+    border-radius: 25px;
+    padding: 12px 25px;
+    font-weight: 600;
+    box-shadow: 0 2px 10px rgba(0,123,255,0.3);
+}
+
+/* 食材追加フォーム */
+.add-ingredient-form {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.add-ingredient-form input {
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.add-ingredient-form .btn {
+    border: none;
+    background: rgba(255,255,255,0.2);
+    color: white;
+    font-weight: 600;
+}
+
+/* レシピの表示制御（JavaScript制御） */
+.recipe-item {
+    display: none;
+}
+
+.show-more-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.btn-show-more {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    border: none;
+    color: white;
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(0,123,255,0.3);
+    transition: transform 0.2s;
+}
+
+.btn-show-more:hover {
+    transform: translateY(-1px);
+    background: linear-gradient(135deg, #0056b3, #004085);
+}
+
+.results-info {
+    text-align: center;
+    margin-bottom: 15px;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+/* レシピカード */
+.recipe-card {
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+.recipe-card:hover {
+    transform: translateY(-2px);
+}
+
+.recipe-card img {
+    height: 150px;
+    object-fit: cover;
+}
+
+.recipe-card .card-title {
+    font-size: 0.9rem;
+    line-height: 1.3;
+}
+
+/* フラッシュメッセージ */
+.alert {
+    border: none;
+    border-radius: 10px;
+}
+
+/* 空の状態 */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #6c757d;
+}
+
+.empty-state-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    opacity: 0.5;
+}
+
+/* タッチ操作の改善 */
+.btn {
+    min-height: 44px;
+    border-radius: 8px;
+}
+
+.form-control, .form-select {
+    min-height: 44px;
+    border-radius: 8px;
+}
+
+/* 色分け（賞味期限） */
+.text-danger { color: #dc3545 !important; }
+.text-warning { color: #fd7e14 !important; }
+.text-success { color: #198754 !important; }
+
+/* レスポンシブ調整 */
+@media (max-width: 576px) {
+    .container {
+        padding: 10px;
+    }
+    
+    .section-card {
+        padding: 15px;
+    }
+    
+    .col-6 {
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+}
+
+/* インストール案内 */
+.install-notice {
+    background: linear-gradient(135deg, #17a2b8, #138496);
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.install-notice strong {
+    display: block;
+    margin-bottom: 5px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* login.htmlより */
+
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.login-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    padding: 40px 30px;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.app-logo {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.app-logo h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.app-logo p {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.form-control {
+    border-radius: 12px;
+    border: 2px solid #e9ecef;
+    padding: 15px;
+    font-size: 16px; /* iOSのズーム防止 */
+    transition: all 0.3s;
+}
+
+.form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+}
+
+.btn-login {
+    border-radius: 12px;
+    padding: 15px;
+    font-weight: 600;
+    font-size: 16px;
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    border: none;
+    box-shadow: 0 4px 15px rgba(0,123,255,0.3);
+    transition: transform 0.2s;
+}
+
+.btn-login:hover {
+    transform: translateY(-1px);
+    background: linear-gradient(135deg, #0056b3, #004085);
+}
+
+.register-link {
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e9ecef;
+}
+
+.register-link a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.alert {
+    border-radius: 12px;
+    border: none;
+}
+
+.form-floating label {
+    color: #6c757d;
+    font-size: 14px;
+}
+
+@media (max-width: 480px) {
+    .login-card {
+        padding: 30px 20px;
+        margin: 10px;
+        border-radius: 15px;
+    }
+    
+    .app-logo h1 {
+        font-size: 2rem;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* refrigerator.htmlより */
+.ingredient-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f8f9fa;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    transition: background-color 0.2s;
+}
+
+.ingredient-controls.selected {
+    background: #e3f2fd;
+    border: 2px solid #2196f3;
+}
+
+.ingredient-checkbox {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.ingredient-name {
+    font-weight: 600;
+    color: #495057;
+    flex: 1;
+    min-width: 0;
+}
+
+.ingredient-info {
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-top: 2px;
+}
+
+.quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn-quantity {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sort-buttons {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+}
+
+.sort-buttons .btn {
+    font-size: 0.8rem;
+    padding: 5px 12px;
+    min-height: auto;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #6c757d;
+}
+
+.empty-state-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    opacity: 0.5;
+}
+
+/* 一括操作バー */
+.bulk-actions-bar {
+    position: sticky;
+    top: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    display: none;
+    z-index: 100;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.bulk-actions-bar.active {
+    display: block;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.bulk-actions-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.selected-count {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.bulk-action-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.bulk-action-buttons .btn {
+    font-size: 0.85rem;
+    padding: 8px 15px;
+    border: none;
+    background: rgba(255,255,255,0.2);
+    color: white;
+    backdrop-filter: blur(10px);
+}
+
+.bulk-action-buttons .btn:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+.bulk-action-buttons .btn-danger {
+    background: rgba(244,67,54,0.8);
+}
+
+.bulk-action-buttons .btn-danger:hover {
+    background: rgba(244,67,54,1);
+}
+
+/* モーダルスタイル */
+.bulk-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.bulk-modal.active {
+    display: flex;
+}
+
+.bulk-modal-content {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+}
+
+.bulk-modal-header {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.bulk-modal-body {
+    margin-bottom: 20px;
+}
+
+.bulk-modal-footer {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+/* タブスタイル */
+.category-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 10px;
+}
+
+.category-tab {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    color: #495057;
+    padding: 8px 16px;
+    text-decoration: none;
+    border-radius: 20px 20px 0 0;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.category-tab:hover {
+    background: #e9ecef;
+    color: #495057;
+    text-decoration: none;
+}
+
+.category-tab.active {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+    box-shadow: 0 2px 4px rgba(0,123,255,0.3);
+}
+
+.category-tab .badge {
+    background: rgba(255,255,255,0.3);
+    color: white;
+    font-size: 0.7rem;
+    margin-left: 5px;
+    padding: 2px 6px;
+    border-radius: 10px;
+}
+
+.category-tab:not(.active) .badge {
+    background: #6c757d;
+    color: white;
+}
+
+.tab-content {
+    min-height: 200px;
+}
+
+.category-section {
+    display: none;
+}
+
+.category-section.active {
+    display: block;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.category-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 10px 15px;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-radius: 8px;
+}
+
+.category-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #495057;
+    margin: 0;
+}
+
+.category-stats {
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+.select-all-btn {
+    font-size: 0.8rem;
+    padding: 4px 10px;
+    margin-left: 10px;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+    .category-tabs {
+        justify-content: center;
+    }
+    
+    .category-tab {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+    }
+
+    .bulk-action-buttons {
+        justify-content: center;
+    }
+
+    .bulk-action-buttons .btn {
+        flex: 1;
+        min-width: 100px;
+    }
+}
+
+/* 全て表示タブのスタイル */
+.category-tab.all-tab {
+    background: #28a745;
+    color: white;
+    border-color: #28a745;
+}
+
+.category-tab.all-tab:hover {
+    background: #218838;
+    color: white;
+}
+
+.category-tab.all-tab.active {
+    background: #1e7e34;
+    box-shadow: 0 2px 4px rgba(40,167,69,0.3);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* register.htmlより */
+/*body設定は削除（base.htmlで管理するので）*/
+
+.register-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    background: linear-gradient(135deg, #28a745, #20c997);
+}
+
+.register-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    padding: 40px 30px;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.app-logo {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.app-logo h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.app-logo p {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.form-control {
+    border-radius: 12px;
+    border: 2px solid #e9ecef;
+    padding: 15px;
+    font-size: 16px; /* iOSのズーム防止 */
+    transition: all 0.3s;
+}
+
+.form-control:focus {
+    border-color: #28a745;
+    box-shadow: 0 0 0 0.2rem rgba(40,167,69,0.25);
+}
+
+.btn-register {
+    border-radius: 12px;
+    padding: 15px;
+    font-weight: 600;
+    font-size: 16px;
+    background: linear-gradient(135deg, #28a745, #20c997);
+    border: none;
+    box-shadow: 0 4px 15px rgba(40,167,69,0.3);
+    transition: transform 0.2s;
+}
+
+.btn-register:hover {
+    transform: translateY(-1px);
+    background: linear-gradient(135deg, #218838, #1e7e34);
+}
+
+.login-link {
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e9ecef;
+}
+
+.login-link a {
+    color: #28a745;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.alert {
+    border-radius: 12px;
+    border: none;
+}
+
+.form-floating label {
+    color: #6c757d;
+    font-size: 14px;
+}
+
+.form-text {
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-top: 0.25rem;
+}
+
+.password-strength {
+    height: 4px;
+    border-radius: 2px;
+    margin-top: 5px;
+    background: #e9ecef;
+    transition: all 0.3s;
+}
+
+.password-strength.weak { background: #dc3545; }
+.password-strength.medium { background: #ffc107; }
+.password-strength.strong { background: #28a745; }
+
+@media (max-width: 480px) {
+    .register-card {
+        padding: 30px 20px;
+        margin: 10px;
+        border-radius: 15px;
+    }
+    
+    .app-logo h1 {
+        font-size: 2rem;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* search.htmlより */
+.search-form input[type="text"] {
+    border-radius: 25px;
+    padding: 12px 20px;
+    border: 2px solid #e9ecef;
+    font-size: 14px;
+}
+
+.search-form input[type="text"]:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+}
+
+.btn-search {
+    border-radius: 25px;
+    padding: 12px 25px;
+    font-weight: 600;
+    box-shadow: 0 2px 10px rgba(0,123,255,0.3);
+}
+
+.ingredient-list {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 10px;
+    background: #f8f9fa;
+}
+
+.form-check {
+    padding: 8px;
+    border-radius: 6px;
+    margin-bottom: 5px;
+}
+
+.form-check:hover {
+    background: rgba(0,123,255,0.1);
+}
+
+.recipe-card {
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+.recipe-card:hover {
+    transform: translateY(-2px);
+}
+
+.recipe-card img {
+    height: 150px;
+    object-fit: cover;
+}
+
+.recipe-card .card-title {
+    font-size: 0.9rem;
+    line-height: 1.3;
+}
+
+.results-info {
+    text-align: center;
+    margin-bottom: 15px;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.btn-show-more {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    border: none;
+    color: white;
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(0,123,255,0.3);
+    transition: transform 0.2s;
+}
+
+.btn-show-more:hover {
+    transform: translateY(-1px);
+    background: linear-gradient(135deg, #0056b3, #004085);
+}
+
+.show-more-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.no-ingredients-notice {
+    background: linear-gradient(135deg, #17a2b8, #138496);
+    color: white;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+}
+
+/* レシピ表示制御用CSS */
+.recipe-item {
+    display: none !important;
+}
+
+.recipe-item.show {
+    display: block !important;
+}

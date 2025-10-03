@@ -47,7 +47,7 @@
                 
                 <!-- カテゴリ編集フォーム -->
                 <form class="category-edit-form-{{ ing.id }} d-none" 
-                      action="{{ url_for('edit_category', id=ing.id) }}" 
+                      action="{{ url_for('recipe_app.edit_category', id=ing.id) }}" 
                       method="post" 
                       style="display: inline;">
                     <select name="category" class="form-select form-select-sm d-inline-block w-auto">
@@ -77,14 +77,14 @@
 
         <!-- 数量コントロール -->
         <div class="quantity-controls">
-            <form action="{{ url_for('change_quantity', id=ing.id, action='minus') }}" method="post" style="display:inline;">
+            <form action="{{ url_for('recipe_app.change_quantity', id=ing.id, action='minus') }}" method="post" style="display:inline;">
                 <button type="submit" class="btn btn-outline-secondary btn-sm btn-quantity">−</button>
             </form>
             <span class="mx-2 fw-bold">{{ ing.quantity }}</span>
-            <form action="{{ url_for('change_quantity', id=ing.id, action='plus') }}" method="post" style="display:inline;">
+            <form action="{{ url_for('recipe_app.change_quantity', id=ing.id, action='plus') }}" method="post" style="display:inline;">
                 <button type="submit" class="btn btn-outline-secondary btn-sm btn-quantity">+</button>
             </form>
-            <a href="{{ url_for('delete_ingredient', id=ing.id) }}" 
+            <a href="{{ url_for('recipe_app.delete_ingredient', id=ing.id) }}" 
                class="btn btn-outline-danger btn-sm ms-2"
                onclick="return confirm('{{ ing.name }}を削除しますか？')">🗑</a>
         </div>
