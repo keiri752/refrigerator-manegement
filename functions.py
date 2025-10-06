@@ -4,7 +4,10 @@ from bs4 import BeautifulSoup
 import requests
 import urllib.parse
 import  os
-
+from pywebpush import webpush, WebPushException
+import json
+from models import PushSubscription
+from datetime import datetime
 
 # 賞味期限チェック関数
 def get_expiry_notifications(user_id):
@@ -198,3 +201,109 @@ def is_https_environment():
     if os.environ.get('HTTP_X_FORWARDED_SSL') == 'on':
         return True
     return False
+
+
+
+
+
+
+
+def send_push_notification(user_id, title, body, url=None, icon=None):
+    """ユーザーにプッシュ通知を送信"""
+    try:
+        from flask import current_app
+        
+        # ユーザーの全購読を取得
+        subscriptions = PushSubscription.query.filter_by(user_id=user_id).all()
+        
+        if not subscriptions:
+            print(f"[PUSH] No subscriptions found for user {user_id}")
+            return False
+        
+        # 通知ペイロード
+        payload = {
+            'title': title,
+            'body': body,
+            'icon': icon or '/static/icon-192x192.png',
+            'badge': '/static/icon-192x192.png',
+            'url': url or '/',
+            'timestamp': datetime.now().isoformat()
+        }
+        
+        success_count = 0
+        failed_subscriptions = []
+        
+        # 各購読に通知を送信
+        for subscription in subscriptions:
+            try:
+                webpush(
+                    subscription_info=subscription.to_dict(),
+                    data=json.dumps(payload),
+                    vapid_private_key=current_app.config['VAPID_PRIVATE_KEY'],
+                    vapid_claims=current_app.config['VAPID_CLAIMS']
+                )
+                success_count += 1
+                print(f"[PUSH] Sent to subscription {subscription.id}")
+                
+            except WebPushException as e:
+                print(f"[PUSH ERROR] Failed to send: {e}")
+                # 無効な購読（404, 410エラー）を記録
+                if e.response and e.response.status_code in [404, 410]:
+                    failed_subscriptions.append(subscription)
+        
+        # 無効な購読を削除
+        for sub in failed_subscriptions:
+            db.session.delete(sub)
+            print(f"[PUSH] Removed invalid subscription {sub.id}")
+        
+        if failed_subscriptions:
+            db.session.commit()
+        
+        return success_count > 0
+        
+    except Exception as e:
+        print(f"[PUSH ERROR] send_push_notification failed: {e}")
+        return False
+
+
+def check_and_send_expiry_notifications():
+    """全ユーザーの賞味期限をチェックして通知を送信"""
+    try:
+        from models import User
+        users = User.query.all()
+        
+        for user in users:
+            notifications = get_expiry_notifications(user.id)
+            
+            # 賞味期限切れ通知
+            if notifications['expired']:
+                ingredient_names = ', '.join([ing.name for ing in notifications['expired'][:3]])
+                count = len(notifications['expired'])
+                more = f'など{count}個' if count > 3 else f'{count}個'
+                
+                send_push_notification(
+                    user.id,
+                    '⚠️ 賞味期限切れの食材があります',
+                    f'{ingredient_names}{more}の食材が期限切れです',
+                    url='/refrigerator'
+                )
+            
+            # 3日以内通知
+            elif notifications['expiring_soon']:
+                ingredient_names = ', '.join([ing.name for ing in notifications['expiring_soon'][:3]])
+                count = len(notifications['expiring_soon'])
+                more = f'など{count}個' if count > 3 else f'{count}個'
+                
+                send_push_notification(
+                    user.id,
+                    '⏰ 賞味期限が近づいています',
+                    f'{ingredient_names}{more}の食材が3日以内に期限切れになります',
+                    url='/search'
+                )
+        
+        print(f"[PUSH] Checked {len(users)} users for expiry notifications")
+        return True
+        
+    except Exception as e:
+        print(f"[PUSH ERROR] check_and_send_expiry_notifications failed: {e}")
+        return False

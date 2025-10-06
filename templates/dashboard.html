@@ -151,6 +151,24 @@
         </a>
     </div>
 {% endif %}
+<!-- プッシュ通知設定カード -->
+    <div class="section-card">
+        <div class="section-title">🔔 プッシュ通知設定</div>
+        <p class="text-muted small mb-3">賞味期限が近づいたときに通知を受け取れます</p>
+    
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <span>通知状態: <span id="pushNotificationStatus" class="badge bg-secondary">未設定</span></span>
+        </div>
+    
+        <button id="pushNotificationToggle" class="btn btn-primary w-100 mb-2" onclick="togglePushNotification()">
+            🔔 通知を許可する
+        </button>
+    
+        <button id="testNotificationBtn" class="btn btn-outline-secondary w-100" onclick="sendTestNotification()" style="display: none;">
+        テスト通知を送信
+        </button>
+    </div>
+
 {% endblock %}
 
 {% block extra_js %}
@@ -231,5 +249,24 @@
             notifications: {{ (notifications.expired|length + notifications.expiring_soon|length + notifications.expiring_week|length) }}
         });
     });
+</script>
+
+<script src="/static/js/push-notifications.js"></script>
+<script>
+async function togglePushNotification() {
+    if (pushManager.subscription) {
+        await pushManager.unsubscribe();
+        document.getElementById('testNotificationBtn').style.display = 'none';
+    } else {
+        const success = await pushManager.requestPermission();
+        if (success) {
+            document.getElementById('testNotificationBtn').style.display = 'block';
+        }
+    }
+}
+
+async function sendTestNotification() {
+    await pushManager.sendTestNotification();
+}
 </script>
 {% endblock %}

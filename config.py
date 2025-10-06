@@ -3,7 +3,7 @@ import sys
 import os
 from functions import is_https_environment
 from datetime import timedelta
-
+from pywebpush import webpush, WebPushException
 
 """
 getattr(get attribute)：属性を取得
@@ -55,3 +55,10 @@ class Config():
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = 'Lax'
     PERMANENT_SESSION_LIFETIME = timedelta(hours=24)
+
+    # プッシュ通知設定
+    VAPID_PUBLIC_KEY = 'BE2g_N2gWJHmSUn7FPa2Oto8aUoYg4zPQc5lglmNjI1ET26QOCBeX4Ng4OMKEApWjlPUrd0ZRsBmTuRaa8bTsCM'
+    VAPID_PRIVATE_KEY = 'mLrbrtBO5rCjE2UXMXkwPUacwiSZpkzojcvMXoY1nLQ'
+    VAPID_CLAIMS = {
+        "sub": "mailto:keiri752@gmail.com"  # あなたのメールアドレスに変更
+    }

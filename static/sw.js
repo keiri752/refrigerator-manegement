@@ -283,3 +283,94 @@ console.log('📋 User data cache prevention: ENABLED');
 console.log('🔍 Search page caching: CONDITIONAL (GET only)');
 console.log('📱 Multi-page navigation support: ENABLED');
 // レシピお気に入り機能追加予定
+
+
+// ==============================================
+// プッシュ通知機能
+// ==============================================
+
+// プッシュ通知受信
+self.addEventListener('push', function(event) {
+  console.log('📬 Push notification received:', event);
+  
+  let data = {
+    title: 'レシピ検索アプリ',
+    body: '新しい通知があります',
+    icon: '/static/icon-192x192.png',
+    badge: '/static/icon-192x192.png',
+    url: '/'
+  };
+  
+  if (event.data) {
+    try {
+      data = event.data.json();
+    } catch (e) {
+      console.error('Failed to parse push data:', e);
+    }
+  }
+  
+  const options = {
+    body: data.body,
+    icon: data.icon,
+    badge: data.badge,
+    data: {
+      url: data.url,
+      timestamp: data.timestamp || Date.now()
+    },
+    vibrate: [200, 100, 200],
+    tag: 'recipe-app-notification',
+    requireInteraction: false,
+    actions: [
+      {
+        action: 'open',
+        title: '開く',
+        icon: '/static/icon-192x192.png'
+      },
+      {
+        action: 'close',
+        title: '閉じる'
+      }
+    ]
+  };
+  
+  event.waitUntil(
+    self.registration.showNotification(data.title, options)
+  );
+});
+
+// 通知クリック処理
+self.addEventListener('notificationclick', function(event) {
+  console.log('🖱️ Notification clicked:', event);
+  
+  event.notification.close();
+  
+  if (event.action === 'close') {
+    return;
+  }
+  
+  const urlToOpen = event.notification.data.url || '/';
+  
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncloned: true })
+      .then(function(clientList) {
+        // 既に開いているウィンドウがあればフォーカス
+        for (let i = 0; i < clientList.length; i++) {
+          const client = clientList[i];
+          if (client.url.includes(urlToOpen) && 'focus' in client) {
+            return client.focus();
+          }
+        }
+        // なければ新しいウィンドウを開く
+        if (clients.openWindow) {
+          return clients.openWindow(urlToOpen);
+        }
+      })
+  );
+});
+
+// 通知を閉じた時の処理
+self.addEventListener('notificationclose', function(event) {
+  console.log('❌ Notification closed:', event);
+});
+
+console.log('🔔 Push notification handlers registered');

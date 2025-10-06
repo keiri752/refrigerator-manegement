@@ -23,7 +23,8 @@ from middleware.login_out import loginout_bp
 from middleware.pwa import pwa_bp
 from middleware.recipe import recipe_bp
 from config import Config
-
+# 既存のインポートの後に追加
+from middleware.push_notification import push_bp
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -37,7 +38,8 @@ app.register_blueprint(https_bp)
 app.register_blueprint(loginout_bp)
 app.register_blueprint(pwa_bp)
 app.register_blueprint(recipe_bp)
-
+# 既存のapp.register_blueprint()の後に追加
+app.register_blueprint(push_bp)
 
 
 # ====================

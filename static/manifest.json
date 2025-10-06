@@ -1,6 +1,6 @@
 {
   "name": "レシピ検索アプリ - 冷蔵庫食材活用",
-  "short_name": "レシピ検索",
+  "short_name": "Fridgee",
   "description": "冷蔵庫の食材から美味しいレシピを見つけよう。賞味期限管理もできる便利なアプリです。",
   "start_url": "/",
   "display": "standalone",
