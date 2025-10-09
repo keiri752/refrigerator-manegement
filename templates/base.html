@@ -108,13 +108,13 @@
     <script>
         // PWA Service Worker登録
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js')
+            navigator.serviceWorker.register("{{ url_for('static', filename='sw.js') }}")
                 .then(function(registration) {
                     console.log('✅ Service Worker registered');
                 })
-                .catch(function(error) {
-                    console.log('❌ Service Worker registration failed:', error);
-                });
+            .catch(function(error) {
+            console.log('❌ Service Worker registration failed:', error);
+            });
         }
         
         // フォーム送信の重複防止

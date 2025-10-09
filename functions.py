@@ -207,7 +207,7 @@ def is_https_environment():
 
 
 
-
+#　プッシュ通知追加分
 def send_push_notification(user_id, title, body, url=None, icon=None):
     """ユーザーにプッシュ通知を送信"""
     try:
