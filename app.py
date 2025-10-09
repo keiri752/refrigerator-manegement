@@ -42,6 +42,16 @@ app.register_blueprint(recipe_bp)
 app.register_blueprint(push_bp)
 
 
+
+# Service Workerをルート直下で配信（PWA Blueprintとは別）
+@app.route('/sw.js')
+def service_worker_root():
+    response = send_from_directory('static', 'sw.js', mimetype='application/javascript')
+    response.headers['Service-Worker-Allowed'] = '/'
+    response.headers['Cache-Control'] = 'no-cache'
+    return response
+
+
 # ====================
 # dbとappの接続
 # ====================

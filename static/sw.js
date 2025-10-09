@@ -4,9 +4,9 @@ const DYNAMIC_CACHE = 'dynamic-multipage-v3';
 
 // 静的リソースのみキャッシュ（ユーザーデータを含むページは除外）
 const urlsToCache = [
-  '/login',
-  '/register', 
-  '/static/manifest.json',
+  '/static/style.css',
+  '/static/icon-192x192.png',
+  '/pwa/manifest.json',  // ← manifestはpwa配下のまま
   'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css',
   'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js'
 ];
