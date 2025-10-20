@@ -25,7 +25,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     
     <!-- ▼▼▼▼▼追加▼▼▼▼▼ -->
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}?v=2">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}?v=9">
     <!-- ▲▲▲▲▲追加▲▲▲▲▲ -->
 
 </head>
@@ -33,11 +33,10 @@
     <div class="container">
         <!-- ヘッダー -->
         <div class="app-header">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h1>🍳 {% block page_title %}レシピ検索アプリ{% endblock %}</h1>
-                    <div class="user-info">ようこそ、{{ session.username }}さん</div>
-                </div>
+            <div class="d-flex align-items-center">
+                <img src="{{ url_for('static', filename='icon-192x192.png') }}" alt="Fridgee" class="header-logo">
+                    <h1>{% block page_title %}レシピ検索アプリ{% endblock %}</h1>
+            </div>
                 <a href="{{ url_for('loginout_app.logout') }}" class="btn btn-outline-light btn-sm">
                     ログアウト
                 </a>
@@ -68,43 +67,53 @@
         <div class="nav-item">
             <a href="{{ url_for('recipe_app.dashboard') }}" class="nav-link {{ 'active' if request.endpoint == 'recipe_app.dashboard' }}">
                 <div class="nav-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px" fill="#007bff"><path d="M222.15-182.15h143.78v-251.92h228.14v251.92h143.78v-386.89L480-762.37 222.15-568.96v386.81Zm-68.13 68.13v-489.09L480-847.65l326.22 244.54v489.09H528.57v-254.55h-97.14v254.55H154.02ZM480-472.76Z"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" height="40px" viewBox="0 -960 960 960" width="40px" fill="#003e80"><path d="M226.67-186.67h140v-246.66h226.66v246.66h140v-380L480-756.67l-253.33 190v380ZM160-120v-480l320-240 320 240v480H526.67v-246.67h-93.34V-120H160Zm320-352Z"/></svg>
                 </div>
+                <div>ホーム</div>
             </a>
         </div>
         <div class="nav-item">
             <a href="{{ url_for('recipe_app.refrigerator') }}" class="nav-link {{ 'active' if request.endpoint == 'recipe_app.refrigerator' }}">
-                <div class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px" fill="#000000"><path d="M323-645v-104h35v104h-35Zm0 329v-175h35v175h-35Zm-59 200q-27.75 0-47.37-19.63Q197-155.25 197-183v-594q0-27.75 19.63-47.38Q236.25-844 264-844h432q27.75 0 47.38 19.62Q763-804.75 763-777v594q0 27.75-19.62 47.37Q723.75-116 696-116H264Zm0-35h432q14 0 23-9t9-23v-367H232v367q0 14 9 23t23 9Zm-32-434h496v-192q0-14-9-23t-23-9H264q-14 0-23 9t-9 23v192Z"/></svg>
+                <div class="nav-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="40px" viewBox="0 -960 960 960" width="40px" fill="#003e80"><path d="M312.67-646.67v-118.66h66.66v118.66h-66.66Zm0 360.67v-197.33h66.66V-286h-66.66Zm-86 206q-27.5 0-47.09-19.58Q160-119.17 160-146.67v-666.66q0-27.5 19.58-47.09Q199.17-880 226.67-880h506.66q27.5 0 47.09 19.58Q800-840.83 800-813.33v666.66q0 27.5-19.58 47.09Q760.83-80 733.33-80H226.67Zm0-66.67h506.66V-532H226.67v385.33Zm0-452h506.66v-214.66H226.67v214.66Z"/></svg>
                 </div>
+                <div>冷蔵庫</div>
             </a>
         </div>
         <div class="nav-item">
             <a href="{{ url_for('recipe_app.search') }}" class="nav-link {{ 'active' if request.endpoint == 'recipe_app.search' }}">
-                <div class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px" fill="#007bff"><path d="M795.76-114.3 531.33-378.5q-29.76 25.26-69.6 39.41-39.84 14.16-85.16 14.16-109.84 0-185.96-76.2Q114.5-477.33 114.5-585t76.2-183.87q76.19-76.2 184.37-76.2 108.17 0 183.86 76.2 75.7 76.2 75.7 184.02 0 43.33-13.64 82.97t-40.92 74.4L845.5-164.04l-49.74 49.74ZM375.65-393.07q79.73 0 135.29-56.24Q566.5-505.55 566.5-585q0-79.45-55.6-135.69-55.59-56.24-135.25-56.24-80.49 0-136.76 56.24-56.26 56.24-56.26 135.69 0 79.45 56.23 135.69 56.23 56.24 136.79 56.24Z"/></svg>
+                <div class="nav-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="40px" viewBox="0 -960 960 960" width="40px" fill="#003e80"><path d="M80-200v-66.67h400V-200H80Zm0-206.67v-66.66h200v66.66H80Zm0-206.66V-680h200v66.67H80ZM833.33-200l-158-158Q650-339 620.5-329.5T560-320q-83 0-141.5-58.5T360-520q0-83 58.5-141.5T560-720q83 0 141.5 58.5T760-520q0 31-9.5 60.5T722-404.67l158 158L833.33-200ZM559.84-386.67q55.49 0 94.49-38.84 39-38.84 39-94.33 0-55.49-38.84-94.49-38.84-39-94.33-39-55.49 0-94.49 38.84-39 38.84-39 94.33 0 55.49 38.84 94.49 38.84 39 94.33 39Z"/></svg>
                 </div>
+                <div>検索</div>
             </a>
         </div>
         <div class="nav-item">
             <a href="{{ url_for('recipe_app.add_ingredient') }}" class="nav-link {{ 'active' if request.endpoint == 'recipe_app.add_ingredient' }}">
-                <div class="nav-icon">➕</div>
+                <div class="nav-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="40px" viewBox="0 -960 960 960" width="40px" fill="#003e80"><path d="M446.67-280h66.66v-166.67H680v-66.66H513.33V-680h-66.66v166.67H280v66.66h166.67V-280Zm-260 160q-27 0-46.84-19.83Q120-159.67 120-186.67v-586.66q0-27 19.83-46.84Q159.67-840 186.67-840h586.66q27 0 46.84 19.83Q840-800.33 840-773.33v586.66q0 27-19.83 46.84Q800.33-120 773.33-120H186.67Zm0-66.67h586.66v-586.66H186.67v586.66Zm0-586.66v586.66-586.66Z"/></svg>
+                </div>
                 <div>追加</div>
             </a>
         </div>
         <div class="nav-item">
             <a href="{{ url_for('recipe_app.favorites') }}" class="nav-link {{ 'active' if request.endpoint == 'recipe_app.favorites' }}">
-                <div class="nav-icon">💖</div>
+                <div class="nav-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="40px" viewBox="0 -960 960 960" width="40px" fill="#003e80"><path d="M440-498.33Zm0 377.66-108.33-98.66q-82-75-137.5-130t-90-100.67q-34.5-45.67-49.34-86.67-14.83-41-14.83-87Q40-715 101.33-777.5q61.34-62.5 152-62.5 55.34 0 103.34 25T440-742.67Q479.33-792 526.33-816t100.34-24q80.71 0 135.52 51.83 54.81 51.84 69.48 126.84H764q-12-50-48.67-81-36.66-31-88.66-31-51 0-92.67 29.83t-70.33 82.83h-48Q388-713 345.5-743.17q-42.5-30.16-92.17-30.16-63 0-104.83 42.83t-41.83 106.83q0 37 15 73t52.59 82.22q37.59 46.21 102.33 108Q341.33-298.67 440-209.33q30-27 60.67-53.67 30.66-26.67 56.33-49.33l7.42 7.31q7.42 7.32 16.08 15.85 8.66 8.54 16.08 15.85L604-266q-25.33 22.67-56 49.17t-61.33 54.16l-46.67 42ZM726.67-280v-126.67H600v-66.66h126.67V-600h66.66v126.67H920v66.66H793.33V-280h-66.66Z"/></svg>
+                </div>
                 <div>保存</div>
             </a>
         </div>
         <div class="nav-item">
             <a href="{{ url_for('recipe_app.history') }}" class="nav-link {{ 'active' if request.endpoint == 'recipe_app.history' }}">
-                <div class="nav-icon">📜</div>
+                <div class="nav-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="40px" viewBox="0 -960 960 960" width="40px" fill="#003e80"><path d="M478-120q-145.33 0-248.83-100.83-103.5-100.84-108.5-246.5H188q4.67 118 88.17 199.33 83.5 81.33 201.83 81.33 123.67 0 209.5-86.5t85.83-210.16q0-121.67-86.5-205.84-86.5-84.16-208.83-84.16-68.33 0-128 31.33t-102.67 84H354v66.67H134.67V-810h66.66v102q51.67-62 123.84-97 72.16-35 152.83-35 75 0 140.83 28.17 65.84 28.16 115 76.66Q783-686.67 811.5-621.5T840-481.33q0 75-28.5 140.83-28.5 65.83-77.67 114.67-49.16 48.83-115 77.33Q553-120 478-120Zm122.67-195.33-153.34-152V-682H514v187.33l134 132-47.33 47.34Z"/></svg>
+                </div>
                 <div>履歴</div>
             </a>
         </div>
     </div>
 </nav>
-
     <!-- ここからJavaScript -->
     <script>
         // PWA Service Worker登録

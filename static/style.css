@@ -13,7 +13,7 @@ body {
 
 /* ヘッダー */
 .app-header {
-    background: linear-gradient(135deg, #007bff, #0056b3);
+    background: linear-gradient(135deg, #3780b3, #0056b3) !important;
     color: white;
     padding: 15px;
     margin: -15px -15px 0 -15px;
@@ -25,6 +25,15 @@ body {
     font-size: 1.3rem;
     margin: 0;
 }
+
+
+.app-header .header-logo {
+    width: 60px !important;
+    height: 60px !important;
+    margin-right: 12px;
+    object-fit: contain;
+}
+
 
 .user-info {
     font-size: 0.8rem;
