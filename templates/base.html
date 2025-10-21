@@ -25,7 +25,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     
     <!-- ▼▼▼▼▼追加▼▼▼▼▼ -->
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}?v=9">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}?v=11">
     <!-- ▲▲▲▲▲追加▲▲▲▲▲ -->
 
 </head>
@@ -33,15 +33,16 @@
     <div class="container">
         <!-- ヘッダー -->
         <div class="app-header">
-            <div class="d-flex align-items-center">
-                <img src="{{ url_for('static', filename='icon-192x192.png') }}" alt="Fridgee" class="header-logo">
-                    <h1>{% block page_title %}レシピ検索アプリ{% endblock %}</h1>
-            </div>
-                <a href="{{ url_for('loginout_app.logout') }}" class="btn btn-outline-light btn-sm">
-                    ログアウト
-                </a>
-            </div>
+    <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+            <img src="{{ url_for('static', filename='icon-192x192.png') }}" alt="Fridgee" class="header-logo">
+            <h1>{% block page_title %}レシピ検索アプリ{% endblock %}</h1>
         </div>
+        <a href="{{ url_for('loginout_app.logout') }}" class="btn btn-outline-light btn-sm">
+            ログアウト
+        </a>
+    </div>
+</div>
 
         <!-- フラッシュメッセージ -->
         {% with messages = get_flashed_messages() %}
