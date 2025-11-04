@@ -4,6 +4,10 @@ import os
 from functions import is_https_environment
 from datetime import timedelta
 from pywebpush import webpush, WebPushException
+from dotenv import load_dotenv  # ← この行を追加
+
+# .envファイルを読み込む
+load_dotenv()  # ← この行を追加
 
 """
 getattr(get attribute)：属性を取得
@@ -56,9 +60,9 @@ class Config():
     SESSION_COOKIE_SAMESITE = 'Lax'
     PERMANENT_SESSION_LIFETIME = timedelta(hours=24)
 
-    # プッシュ通知設定
-    VAPID_PUBLIC_KEY = 'BE2g_N2gWJHmSUn7FPa2Oto8aUoYg4zPQc5lglmNjI1ET26QOCBeX4Ng4OMKEApWjlPUrd0ZRsBmTuRaa8bTsCM'
-    VAPID_PRIVATE_KEY = 'mLrbrtBO5rCjE2UXMXkwPUacwiSZpkzojcvMXoY1nLQ'
+    # プッシュ通知設定（環境変数から読み込み） ← コメント変更
+    VAPID_PUBLIC_KEY = os.environ.get('VAPID_PUBLIC_KEY')  # ← この行を変更
+    VAPID_PRIVATE_KEY = os.environ.get('VAPID_PRIVATE_KEY')  # ← この行を変更
     VAPID_CLAIMS = {
-        "sub": "mailto:keiri752@gmail.com"  # あなたのメールアドレスに変更
+        "sub": os.environ.get('VAPID_EMAIL', 'mailto:example@example.com')  # ← この行を変更
     }
