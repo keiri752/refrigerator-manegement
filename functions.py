@@ -1,3 +1,6 @@
+from flask import current_app  # ← send_push_notification で使用
+from sqlalchemy import inspect  # ← migrate_database で使用
+
 from models import db, Ingredient, FavoriteRecipe
 from datetime import date
 from bs4 import BeautifulSoup
@@ -40,81 +43,124 @@ def get_expiry_notifications(user_id):
 
 
 # ---------- レシピ取得関数 ----------
+# Nadiaレシピ取得関数（画像がなくても追加）
+
+# 「query」は検索キーワード
 def fetch_nadia_recipes(query):
+
+    # レシピサイトに検索ワードを入れると、URLに検索ワードが渡され検索される
+    # その際に日本語は使えないので、ASCII文字に変換しなければいけない
+    # 「urllib.parse.quote_plus」は、そのための関数
+
     encoded_query = urllib.parse.quote_plus(query)
+
+    # urlの末尾に、検索ワードをエンコードした文字列を追加する
     url = f'https://oceans-nadia.com/search?q={encoded_query}'
+
+    # 「User-Agent」を使って、人間がアクセスしているように見せかけることができる
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+
     try:
+        # 「verify」はssl証明書の検証　通常はTrue
         response = requests.get(url, headers=headers, timeout=10, verify=True)
+
+        # 「BeautifulSoup」は、htmlの中身を解析するために使用
+        # 「.text」で「responce」で取得した文字列
+        # 「html.parser」で<>タグで囲まれている内容や階層構造を理解できるようになる
         soup = BeautifulSoup(response.text, 'html.parser')
         recipes = []
-        for item in soup.select('li.recipeList-fullwidth')[:15]:
-            title_tag = item.select_one('p.recipe-title a.recipe-titlelink')
-            img_tag = item.select_one('div.photo-frame a img')
-            if title_tag and img_tag:
+
+        for item in soup.select('li a[href*="/user/"]')[:15]:
+            title_tag = item.select_one('p.GridRecipes_title__h5BFu')
+            link_tag = item.get('href')
+            img_tag = item.select_one('div.GridRecipes_imageBox__0l_tU img')
+
+            if title_tag and link_tag:
                 title = title_tag.get_text(strip=True)
-                link = title_tag.get('href')
+                if not title:
+                    continue  # タイトルが空ならスキップ
+
+                link = item.get('href')
                 if not link.startswith('http'):
                     link = f"https://oceans-nadia.com{link}"
-                img_url = img_tag.get('src')
+
+                img_url = img_tag.get('src') if img_tag else ''
                 recipes.append({'title': title, 'url': link, 'img': img_url, 'source': 'Nadia'})
+
         return recipes
+
     except Exception as e:
         print(f"[ERROR] Nadia fetch error: {e}")
         return []
 
+# クラシルレシピ取得関数（画像がなくても追加）
 def fetch_kurashiru_recipes(query):
     encoded_query = urllib.parse.quote_plus(query)
     url = f'https://www.kurashiru.com/search?query={encoded_query}'
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+
     try:
         response = requests.get(url, headers=headers, timeout=10, verify=True)
         soup = BeautifulSoup(response.text, 'html.parser')
         recipes = []
+
         for item in soup.select('li.DlyMasonry-content')[:15]:
             title_tag = item.select_one('p.dly-video-item-title-root')
             link_tag = item.select_one('a.DlyLink[href]')
             noscript_tag = item.select_one('noscript')
+
             if title_tag and link_tag:
                 title = title_tag.get_text(strip=True)
                 link = link_tag.get('href')
+
                 if not link.startswith('http'):
                     link = f"https://www.kurashiru.com{link}"
                 img_url = ''
+
                 if noscript_tag:
                     img_soup = BeautifulSoup(noscript_tag.decode_contents(), 'html.parser')
                     img_tag = img_soup.select_one('img')
                     if img_tag:
                         img_url = img_tag.get('src')
                 recipes.append({'title': title, 'url': link, 'img': img_url, 'source': 'クラシル'})
+
         return recipes
+    
     except Exception as e:
         print(f"[ERROR] Kurashiru fetch error: {e}")
         return []
 
+# 楽天レシピ取得関数（画像がなくても追加）
 def fetch_rakuten_recipes(query):
     encoded_query = urllib.parse.quote_plus(query)
     url = f'https://recipe.rakuten.co.jp/search/{encoded_query}'
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+
     try:
         response = requests.get(url, headers=headers, timeout=10, verify=True)
         soup = BeautifulSoup(response.text, 'html.parser')
         recipes = []
+
         for item in soup.select('li.recipe_ranking__item')[:15]:
-            link_tag = item.select_one('a.recipe_ranking__link')
             title_tag = item.select_one('span.recipe_ranking__recipe_title')
+            link_tag = item.select_one('a.recipe_ranking__link')
             img_tag = item.select_one('img')
-            if link_tag and title_tag and img_tag:
+
+            if title_tag and link_tag:
                 title = title_tag.get_text(strip=True)
                 link = link_tag.get('href')
+
                 if not link.startswith('http'):
                     link = f"https://recipe.rakuten.co.jp{link}"
-                img_url = img_tag.get('src')
+                img_url = img_tag.get('src') if img_tag else ''
                 recipes.append({'title': title, 'url': link, 'img': img_url, 'source': '楽天レシピ'})
+
         return recipes
+
     except Exception as e:
         print(f"[ERROR] Rakuten fetch error: {e}")
         return []
+
 
 
 
@@ -129,13 +175,6 @@ def get_priority_ingredient_names(user_id):
     notifications = get_expiry_notifications(user_id)
     priority_ingredients = notifications.get('expired', []) + notifications.get('expiring_soon', [])
     return list(set([ing.name for ing in priority_ingredients[:5]]))  # 最大5つ、重複排除
-
-
-
-
-
-
-
 
 
 
@@ -164,6 +203,8 @@ def migrate_database():
             
     except Exception as e:
         print(f"[MIGRATION ERROR] {e}")
+
+
 
 def migrate_recipe_features():
     """お気に入り・履歴テーブルを作成"""
@@ -207,20 +248,24 @@ def is_https_environment():
 
 
 
-#　プッシュ通知追加分
+# プッシュ通知追加分
+# プッシュ通知が機能するか、ユーザーがテストするための関数？
 def send_push_notification(user_id, title, body, url=None, icon=None):
     """ユーザーにプッシュ通知を送信"""
     try:
         from flask import current_app
         
         # ユーザーの全購読を取得
+        # 購読情報(PushSubscription)：許可したユーザーにブラウザがサーバーに送る情報
+        # endpoint（ブラウザが生成する、通知を送るURL）、p256dh（暗号化用公開鍵）、auth（認証トークン）
         subscriptions = PushSubscription.query.filter_by(user_id=user_id).all()
         
+        # user_idと一致するものが無い場合
         if not subscriptions:
             print(f"[PUSH] No subscriptions found for user {user_id}")
             return False
         
-        # 通知ペイロード
+        # 通知ペイロード（webpushで通知する内容・中身）
         payload = {
             'title': title,
             'body': body,
@@ -237,20 +282,25 @@ def send_push_notification(user_id, title, body, url=None, icon=None):
         for subscription in subscriptions:
             try:
                 webpush(
+                    # to_dictで内容を辞書形式に変換
                     subscription_info=subscription.to_dict(),
+                    # 「json.dumps」でオブジェクトをJSON形式へ変換
                     data=json.dumps(payload),
                     vapid_private_key=current_app.config['VAPID_PRIVATE_KEY'],
                     vapid_claims=current_app.config['VAPID_CLAIMS']
                 )
                 success_count += 1
                 print(f"[PUSH] Sent to subscription {subscription.id}")
-                
+            
+            # webpush通知の送信中に発生する例外
             except WebPushException as e:
                 print(f"[PUSH ERROR] Failed to send: {e}")
-                # 無効な購読（404, 410エラー）を記録
+                # 通知先が無効になっている（削除された・期限切れ）場合にだけ処理を行う
                 if e.response and e.response.status_code in [404, 410]:
+                    # 通知が送れなかった購読情報をリストに追加して記録する
                     failed_subscriptions.append(subscription)
         
+
         # 無効な購読を削除
         for sub in failed_subscriptions:
             db.session.delete(sub)
@@ -260,10 +310,19 @@ def send_push_notification(user_id, title, body, url=None, icon=None):
             db.session.commit()
         
         return success_count > 0
-        
+
+    # 様々なエラーが発生した場合
+    # 「Exception」はすべての一般的なエラー
     except Exception as e:
         print(f"[PUSH ERROR] send_push_notification failed: {e}")
         return False
+
+
+
+
+
+
+
 
 
 def check_and_send_expiry_notifications():

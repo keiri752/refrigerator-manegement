@@ -165,9 +165,29 @@ def search():
                 kurashiru_recipes = fetch_kurashiru_recipes(combined_query)
                 rakuten_recipes = fetch_rakuten_recipes(combined_query)
 
-                results.extend(nadia_recipes)
-                results.extend(kurashiru_recipes)
-                results.extend(rakuten_recipes)
+                # 3つのサイトのレシピを1つずつ順番に表示するようにする
+                # それぞれのサイトがいくつレシピを取得できたか判定（最大はそれぞれ15）
+                nadia_len = len(nadia_recipes)
+                kurashiru_len = len(kurashiru_recipes)
+                rakuten_len = len(rakuten_recipes)
+
+                # 3つのサイトの中で一番取得したレシピ数が多い数を取得
+                max_len = max(nadia_len, kurashiru_len, rakuten_len)
+
+                # 3つのサイトから取得したレシピを１つずつ順番に取り出し、リストに格納する
+                i = 1
+                while i <= max_len:
+                    if nadia_recipes[i - 1]:
+                        results.append(nadia_recipes[i - 1])
+                    if kurashiru_recipes[i - 1]:
+                        results.append(kurashiru_recipes[i - 1])
+                    if rakuten_recipes[i - 1]:
+                        results.append(rakuten_recipes[i - 1])
+                    i += 1
+                    
+                # results.extend(nadia_recipes)
+                # results.extend(kurashiru_recipes)
+                # results.extend(rakuten_recipes)
 
                 print(f"[SEARCH] Nadia recipes: {len(nadia_recipes)}")
                 print(f"[SEARCH] Kurashiru recipes: {len(kurashiru_recipes)}")
