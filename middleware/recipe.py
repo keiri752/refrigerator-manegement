@@ -488,7 +488,7 @@ def add_ingredient():
             db.session.commit()
             print(f"[ADD] Success: '{name}' (category: {category})")
             flash(f'食材「{name}」を追加しました')
-            return redirect(url_for('recipe_app.refrigerator'))
+            return redirect(url_for('recipe_app.add_ingredient'))
         except Exception as e:
             db.session.rollback()
             print(f"[ERROR] Adding ingredient failed: {e}")
